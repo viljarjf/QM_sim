@@ -3,6 +3,7 @@ import numpy as np
 from scipy import sparse as sp
 
 from qm_sim import nature_constants as const
+from qm_sim import finite_difference
 
 
 class Hamiltonian:
@@ -44,59 +45,24 @@ class Hamiltonian:
                 raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
             m = m.flatten()
 
+        scheme_order = {
+            "three-point": 2,
+            "five-point": 4,
+            "seven-point": 6,
+            "nine-point": 8,
+        }
+        order = scheme_order.get(fd_scheme)
+        if order is None:
+            raise ValueError("Requested finite difference is invalid")
+        self.mat = finite_difference.nabla_squared(N, L, order)
+
         # Prefactor in hamiltonian.
         # Is either float or array, depending on `m`
         h0 = -const.h_bar**2 / (2 * m)
         
-        self.mat = self._get_fd_matrix(fd_scheme)
-
         # Multiplying the diagonal data directly is easier
         # if we have non-constant mass
         self.mat.data *= h0
-
-
-    def _get_fd_matrix(self, fd_scheme) -> sp.dia_matrix:
-
-        # lookup the first half of the stencil, to be mirrored later
-        if fd_scheme == "three-point":
-            stencil = [1, -2]
-        elif fd_scheme == "five-point":
-            stencil = [-1/12, 4/3, -5/2]
-        elif fd_scheme == "seven-point":
-            stencil = [-1/12, 4/3, -5/2]
-        elif fd_scheme == "nine-point":
-            stencil = [1/90, -3/20, 3/2, -49/18]
-        else:
-            raise ValueError("Finite difference scheme not found")
-        
-        # set the indices
-        # e.g. [-2, -1, 0, 1, 2]
-        indices = list(-i for i in reversed(range(len(stencil))))
-        indices += [-i for i in indices[-2::-1]]
-        indices = np.array(indices)
-
-        # mirror the stencil
-        # i.e. [a, b, c] -> [a, b, c, b, a]
-        stencil += stencil[-2::-1]
-
-
-        mat = 1
-        prev_N = 1
-        for L, N in zip(self.L, self.N):
-            dz = L / N
-            next_mat = 1/dz**2 * sp.diags(
-                stencil,
-                indices * prev_N,
-                shape=(N * prev_N, N * prev_N),
-                dtype=np.float64,
-                format="dia"
-                )
-            mat = next_mat + sp.kron(sp.eye(N), mat, format="dia")
-            prev_N *= N
-        
-        self._centerline_index = list(mat.offsets).index(0)
-
-        return mat
 
 
     def set_static_potential(self, V0: np.ndarray):

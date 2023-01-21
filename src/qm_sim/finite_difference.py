@@ -104,7 +104,6 @@ def nabla_squared(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matr
     
     indices = _mirror_sign_list([-i for i in range(len(stencil))][::-1])
     stencil = _mirror_list(stencil)
-    print(stencil)
     return _matrix_from_stencil(stencil, indices, 2, N, L)
     
 
@@ -133,10 +132,6 @@ def _matrix_from_stencil(stencil: list[float], indices: list[int], power: int, N
         # Expand the previous iteration with the new one
         mat = next_mat + sp.kron(sp.eye(N), mat, format="dia")
         prev_N *= N
-    from matplotlib import pyplot as plt
-    plt.imshow(mat.toarray())
-    plt.show()
-    
 
     return mat
 
