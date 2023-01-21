@@ -5,9 +5,9 @@ from scipy import sparse as sp
 from qm_sim import nature_constants as const
 
 
-class Hamiltonian(sp.dia_matrix):
+class Hamiltonian:
 
-    def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, fd_scheme: str = "two-point"):
+    def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, fd_scheme: str = "three-point"):
         """Discrete hamiltonian of a system
 
         Args:
@@ -22,8 +22,11 @@ class Hamiltonian(sp.dia_matrix):
             fd_scheme (str, optional): 
                 Finite difference scheme. 
                 Options are: 
-                    - "two-point. 
-                Defaults to "two-point".
+                    - "three-point"
+                    - "five-point"
+                    - "seven-point"
+                    - "nine-point"
+                Defaults to "three-point".
         """
         if len(N) != len(L):
             raise ValueError("`N` and `L` must have same length")
@@ -54,34 +57,80 @@ class Hamiltonian(sp.dia_matrix):
 
     def _get_fd_matrix(self, fd_scheme) -> sp.dia_matrix:
 
-        if fd_scheme == "two-point":
-            dz = self.L[0] / self.N[0]
-            mat = 1/dz ** 2 * sp.diags(
-                [1, -2, 1], # values
-                [-1, 0, 1], # offsets
-                shape=(self.N[0], self.N[0]), 
-                dtype=np.float64, 
+        # lookup the first half of the stencil, to be mirrored later
+        if fd_scheme == "three-point":
+            stencil = [1, -2]
+        elif fd_scheme == "five-point":
+            stencil = [-1/12, 4/3, -5/2]
+        elif fd_scheme == "seven-point":
+            stencil = [-1/12, 4/3, -5/2]
+        elif fd_scheme == "nine-point":
+            stencil = [1/90, -3/20, 3/2, -49/18]
+        else:
+            raise ValueError("Finite difference scheme not found")
+        
+        # set the indices
+        # e.g. [-2, -1, 0, 1, 2]
+        indices = list(-i for i in reversed(range(len(stencil))))
+        indices += [-i for i in indices[-2::-1]]
+        indices = np.array(indices)
+
+        # mirror the stencil
+        # i.e. [a, b, c] -> [a, b, c, b, a]
+        stencil += stencil[-2::-1]
+
+
+        mat = 1
+        prev_N = 1
+        for L, N in zip(self.L, self.N):
+            dz = L / N
+            next_mat = 1/dz**2 * sp.diags(
+                stencil,
+                indices * prev_N,
+                shape=(N * prev_N, N * prev_N),
+                dtype=np.float64,
                 format="dia"
                 )
+            mat = next_mat + sp.kron(sp.eye(N), mat, format="dia")
+            prev_N *= N
+        
+        self._centerline_index = list(mat.offsets).index(0)
 
-            self._centerline_index = 1
-
-        if self._dim == 2:
-            # need to iterate the scheme once again
-            # TODO
-            pass
         return mat
 
 
     def set_static_potential(self, V0: np.ndarray):
         self.mat.data[self._centerline_index, :] += V0.flatten()
         self._default_data = self.mat.data.copy()
+
+
+    def __add__(self, other: np.ndarray) -> sp.dia_matrix:
+            self.mat.data = self._default_data.copy()
+            self.mat.data[self._centerline_index, :] += other.flatten()
+            return self.mat
     
 
-    def add(self, potential: np.ndarray) -> sp.dia_matrix:
-            self.mat.data = self._default_data.copy()
-            self.mat.data[self._centerline_index, :] += potential.flatten()
-            return self.mat
+    def __matmul__(self, other):
+        return self.mat @ other
+    
     
     def asarray(self) -> np.array:
         return self.mat.toarray()
+
+
+    def eigen(self, n: int) -> tuple[np.ndarray, np.ndarray]:
+        """Calculate the n smallest eigenenergies and the corresponding eigenstates of the hamiltonian
+
+        Args:
+            n (int): 
+                Amount of eigenenergies/states to output
+
+        Returns:
+            np.ndarray:
+                Eigenenergies, shape (n,)
+            np.ndarray:
+                Eigenstates, shape (n, *N) for a system with shape N
+        """
+        E, psi = sp.linalg.eigsh(self.mat, k=n, which="SA")
+        psi = np.array([psi[:, i] for i in range(n)])
+        return E, psi
