@@ -55,6 +55,7 @@ class Hamiltonian:
         if order is None:
             raise ValueError("Requested finite difference is invalid")
         self.mat = finite_difference.nabla_squared(N, L, order)
+        self._centerline_index = list(self.mat.offsets).index(0)
 
         # Prefactor in hamiltonian.
         # Is either float or array, depending on `m`
@@ -83,7 +84,6 @@ class Hamiltonian:
     def asarray(self) -> np.array:
         return self.mat.toarray()
 
-
     def eigen(self, n: int) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the n smallest eigenenergies and the corresponding eigenstates of the hamiltonian
 
@@ -95,8 +95,19 @@ class Hamiltonian:
             np.ndarray:
                 Eigenenergies, shape (n,)
             np.ndarray:
-                Eigenstates, shape (n, *N) for a system with shape N
+                Normalised eigenstates, shape (n, *N) for a system with shape N
         """
         E, psi = sp.linalg.eigsh(self.mat, k=n, which="SA")
-        psi = np.array([psi[:, i] for i in range(n)])
+        psi = np.array([psi[:, i].reshape(self.N[::-1]).T for i in range(n)])
+
+        # calculate normalisation factor
+        nf = [psi[i, :]**2 for i in range(n)]
+        for i, (L, N) in enumerate(zip(self.L, self.N)):
+            dx = L / N
+            for j in range(n):
+                nf[j] = np.trapz(nf[j], dx=dx)
+        # normalise
+        for i in range(n):
+            psi[i] /= nf[i]**0.5
+        
         return E, psi
