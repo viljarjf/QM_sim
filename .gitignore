@@ -1,5 +1,6 @@
 dist/
-venv/
+.venv/
+.vscode
 
 **/*.egg-info
 **/__pycache__
