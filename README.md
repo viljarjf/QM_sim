@@ -3,16 +3,17 @@
 Python library for simulation of quantum mechanical systems.
 
 ## Features 
-
 - 1D and 2D systems
 - Choice of finite difference scheme
 - Stationary solutions
 
 ## Planned features
+- Boundary conditions
 - 3D systems
 - Temporal simulation
 - Time-variant potentials
-- Example plots
+- Transfer matrix for transmission ect.
+- Testing
 
 ## Installation
 
@@ -20,40 +21,23 @@ Python library for simulation of quantum mechanical systems.
 
 ## Usage
 
-### No potential
-~~~python
+Examples are provided in the `examples/`-folder.
+These are enumerated with increasing level of simulation complexity.
 
-from qm_sim.hamiltonian import Hamiltonian
-from qm_sim.nature_constants import me
+## Contribution
 
-N = (1000,) # Discretisation point count
-L = (1e-9,) # System size
+To contribute, please open a pull request to the `dev`-branch on [GitHub](https://www.github.com/viljarjf/QM_sim/pulls).
 
-H = Hamiltonian(N, L, me) # Use electron mass
+The following is an example of how to set up VS Code for development, adapt to your IDE of choice.
 
-energies, states = H.eigen(5)
+### Requirements
+- VS Code
+    - Python extension
+- Python 3.10 or above
 
-~~~
-`energies` is now a 5x1 array of eigenenergies, and `states` is a 5x1000 array of the corresponding eigenstates
-
-### Quadratic potential
-~~~python
-
-from qm_sim.hamiltonian import Hamiltonian
-from qm_sim.nature_constants import me, e0
-
-import numpy as np
-
-N = (1000,) # Discretisation point count
-L = (2e-9,) # System size
-
-H = Hamiltonian(N, L, me) # Use electron mass
-
-V = np.linspace(-L[0]/2, L[0]/2, N[0])**2 * e0
-
-H.set_static_potential(V)
-
-energies, states = H.eigen(5)
-
-~~~
-`energies` is now a 5x1 array of eigenenergies, and `states` is a 5x1000 array of the corresponding eigenstates
+### Setup
+1. Clone and open the repo in VS Code
+2. Press f1, and run `Python: Create Environment`. Select `.venv`
+3. In the terminal, run `.venv\Scripts\activate` on Windows, or `source .venv/bin/activate` on Unix
+4. In the same terminal, run `pip install -e .` to install the current directory in an editable state
+5. To run tests, run `pip install pytest` in the terminal, press f1 and run `Python: Configure Tests`. Choose `pytest`
