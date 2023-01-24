@@ -21,7 +21,8 @@ Python library for simulation of quantum mechanical systems.
 
 ## Usage
 
-Examples are provided in the `examples/`-folder
+Examples are provided in the `examples/`-folder.
+These are enumerated with increasing level of simulation complexity.
 
 ## Contribution
 
