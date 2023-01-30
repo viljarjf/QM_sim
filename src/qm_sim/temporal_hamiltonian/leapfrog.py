@@ -1,7 +1,6 @@
 from .base import BaseTemporalHamiltonian
 from ..nature_constants import h_bar
 
-import numpy as np
 
 class Leapfrog(BaseTemporalHamiltonian):
     order = 2
@@ -21,7 +20,7 @@ class Leapfrog(BaseTemporalHamiltonian):
         H0 = self.H0
         Vt = self.Vt
 
-        psi_half = super()._get_psi_0()
+        psi_half = self.psi_0
         Vt_half = self.Vt(dt/2)
         psi_0 = psi_half - dt / (2j*h_bar) * (self.H0 + Vt_half) @ psi_half
         psi_1 = psi_half + dt / (2j*h_bar) * (self.H0 + Vt_half) @ psi_half
@@ -41,7 +40,7 @@ class Leapfrog(BaseTemporalHamiltonian):
 
             tn += dt
 
-            # store data every `t_store` seconds
+            # store data every `dt_storage` seconds
             if tn // dt_storage > len(self.psi):
                 self.psi.append(psi_1)
                 self.t.append(tn)

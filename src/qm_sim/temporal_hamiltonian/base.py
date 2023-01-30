@@ -1,11 +1,9 @@
-from typing import Callable
 from abc import ABC, abstractmethod
+from typing import Callable
 
 import numpy as np
-from scipy import sparse as sp
 
-from qm_sim.hamiltonian import Hamiltonian
-
+from ..hamiltonian import Hamiltonian
 from ..nature_constants import h_bar
 
 
@@ -76,10 +74,11 @@ class BaseTemporalHamiltonian(ABC):
             float: time delta
         """
         # Just use the leapfrog analysis to begin with
-        # TODO perform the vN analysis for each scheme
+        # TODO: perform the vN analysis for each scheme
         # (i.e. make this func abstract)
-        V_max = max(self.Vt)
-        V_min = min(self.Vt)
+        # NOTE: this assumes the temporal part is at most 4x the static part
+        V_max = np.max(self.H0.V0 * 4)
+        V_min = np.min(self.H0.V0 * 4)
 
         E_max = max(
             abs(V_min),
@@ -111,5 +110,8 @@ class BaseTemporalHamiltonian(ABC):
         return np.array(self.t)
     
     def get_Vt(self) -> np.ndarray:
-        Vt = np.array(self.Vt)
+        return np.array(self.V)
+
+    def get_V(self) -> np.ndarray:
+        Vt = np.array(self.V)
         return self.H0.V0 + Vt

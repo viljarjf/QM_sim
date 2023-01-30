@@ -1,6 +1,7 @@
 
 import numpy as np
-from scipy import sparse as sp
+from scipy.sparse import dia_matrix
+from scipy.sparse.linalg import eigsh
 
 from qm_sim import nature_constants as const
 from qm_sim import finite_difference
@@ -45,9 +46,10 @@ class Hamiltonian:
             if m.shape != self.N:
                 raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
             m = m.flatten()
+            self.m = max(m)
+        else:
+            self.m = m
         
-        self.m = max(m)
-
         scheme_order = {
             "three-point": 2,
             "five-point": 4,
@@ -78,7 +80,7 @@ class Hamiltonian:
         self._default_data = self.mat.data.copy()
 
 
-    def __add__(self, other: np.ndarray) -> sp.dia_matrix:
+    def __add__(self, other: np.ndarray) -> dia_matrix:
             self.mat.data = self._default_data.copy()
             self.mat.data[self._centerline_index, :] += other.flatten()
             return self.mat
@@ -104,7 +106,7 @@ class Hamiltonian:
             np.ndarray:
                 Normalised eigenstates, shape (n, *N) for a system with shape N
         """
-        E, psi = sp.linalg.eigsh(self.mat, k=n, which="SA")
+        E, psi = eigsh(self.mat, k=n, which="SA")
         psi = np.array([psi[:, i].reshape(self.N[::-1]).T for i in range(n)])
 
         # calculate normalisation factor
