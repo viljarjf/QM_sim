@@ -35,6 +35,7 @@ class Hamiltonian:
         self.N = N
         self.L = L
         self._dim = len(N)
+        self.delta = [Li / Ni for Li, Ni in zip(L, N)]
         
         # index of the 0-offset.
         # Set in _get_fd_matrix
@@ -44,6 +45,8 @@ class Hamiltonian:
             if m.shape != self.N:
                 raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
             m = m.flatten()
+        
+        self.m = max(m)
 
         scheme_order = {
             "three-point": 2,
@@ -65,8 +68,12 @@ class Hamiltonian:
         # if we have non-constant mass
         self.mat.data *= h0
 
+        # No potential by default
+        self.V0 = 0
+
 
     def set_static_potential(self, V0: np.ndarray):
+        self.V0 = V0
         self.mat.data[self._centerline_index, :] += V0.flatten()
         self._default_data = self.mat.data.copy()
 

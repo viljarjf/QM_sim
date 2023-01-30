@@ -8,9 +8,5 @@ class CrankNicolson(BaseTemporalHamiltonian):
     stable = True
     name = "crank-nicolson"
 
-           
-    def _get_dt(self) -> float:
-        pass
-
     def iterate(self, t: float, dt_storage: float = None):
         pass

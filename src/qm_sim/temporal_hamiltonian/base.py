@@ -6,6 +6,7 @@ from scipy import sparse as sp
 
 from qm_sim.hamiltonian import Hamiltonian
 
+from ..nature_constants import h_bar
 
 
 class BaseTemporalHamiltonian(ABC):
@@ -67,15 +68,24 @@ class BaseTemporalHamiltonian(ABC):
         return (_psi[0, :] + _psi[1, :]) * 2**-0.5
 
         
-    @abstractmethod
     def _get_dt(self) -> float:
         """Calculate a decent `dt` for the given scheme,
-        using von Neumann analysis
+        using von Neumann analysis.
 
         Returns:
             float: time delta
         """
-        pass
+        # Just use the leapfrog analysis to begin with
+        # TODO perform the vN analysis for each scheme
+        # (i.e. make this func abstract)
+        V_max = max(self.Vt)
+        V_min = min(self.Vt)
+
+        E_max = max(
+            abs(V_min),
+            abs(V_max + 4 * h_bar**2 / (4*self.H0.m * sum(d**2 for d in self.H0.delta))),
+            )
+        return 0.25 * h_bar / E_max
 
     @abstractmethod
     def iterate(self, t: float, dt_storage: float = None):
@@ -101,4 +111,5 @@ class BaseTemporalHamiltonian(ABC):
         return np.array(self.t)
     
     def get_Vt(self) -> np.ndarray:
-        return np.array(self.Vt)
+        Vt = np.array(self.Vt)
+        return self.H0.V0 + Vt
