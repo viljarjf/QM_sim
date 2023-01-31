@@ -129,7 +129,7 @@ class Hamiltonian:
         
         Psi_t = np.empty(shape = (self.N[0],self.N[1],steps+1))
         En_t = np.empty(steps+1)
-        
+
         for i in tqdm(range(steps+1)):
             H = self.mat.copy()
             H.data[self._centerline_index, :] += self.V(t0+i*dt).flatten()
@@ -140,7 +140,7 @@ class Hamiltonian:
                 # smartly condition eigsolver to "hug" the single eigenvalue solution; eigenvector and eigenvalue should be
                 # far closer to the previous one than any other if the adiabatic theorem is fulfilled
                 sigma=En_t[i-1] if i != 0 else E_n,
-                v0=Psi_t[:,:,i-1] if i != 0 else np.ones(shape = self.N).flatten()
+                v0=-Psi_t[:,:,i-1] if i != 0 else np.ones(shape = self.N).flatten() # minus preserves vector sign, for some reason
             )
             Psi_t[:,:,i] = psi[:].reshape(self.N[::-1]).T
         return En_t, Psi_t
