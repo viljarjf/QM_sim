@@ -23,8 +23,8 @@ V[
     N[1] // 2 - N[1] // 5 : N[1] // 2 + N[1] // 5
 ] = 0
 
-H.set_static_potential(V)
-
+H.set_potential(V)
+print(V)
 # Solve the system
 energies, states = H.eigen(n)
 
