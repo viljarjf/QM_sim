@@ -11,7 +11,7 @@ from qm_sim import finite_difference
 
 class Hamiltonian:
 
-    def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, fd_scheme: str = "three-point"):
+    def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, fd_scheme: str = "three-point", verbose : bool = True):
         """Discrete hamiltonian of a system
 
         Args:
@@ -31,6 +31,9 @@ class Hamiltonian:
                     - "seven-point"
                     - "nine-point"
                 Defaults to "three-point".
+            verbose (bool):
+                Option to display calculation and iteration info during runtime
+                True by default.
         """
         if len(N) != len(L):
             raise ValueError("`N` and `L` must have same length")
@@ -72,9 +75,11 @@ class Hamiltonian:
         # if we have non-constant mass
         self.mat.data *= h0
 
-        # No potential by default
+        # static zero potential by default
         self.V = np.zeros(shape = N)
         self.__V_timedep = False
+
+        self.verbose = verbose
 
 
     def set_potential(self, V: np.ndarray | Callable[[float], np.ndarray]):
@@ -130,7 +135,7 @@ class Hamiltonian:
         Psi_t = np.empty(shape = (self.N[0],self.N[1],steps+1))
         En_t = np.empty(steps+1)
 
-        for i in tqdm(range(steps+1)):
+        for i in tqdm(range(steps+1), desc="Adiabatic evolution", disable=not self.verbose):
             H = self.mat.copy()
             H.data[self._centerline_index, :] += self.V(t0+i*dt).flatten()
             
