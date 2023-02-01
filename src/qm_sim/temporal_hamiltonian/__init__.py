@@ -38,7 +38,7 @@ def temporal_hamiltonian(H0: Hamiltonian, Vt: Callable[[float], np.ndarray],
                     - leapfrog
                     - forward-euler
                     - backward-euler
-                Defaults to cranc-nicholson
+                Defaults to crank-nicholson
         """
 
         # raises ValueError if scheme is not found

@@ -18,12 +18,15 @@ H = Hamiltonian(N, L, m)
 
 # Set potential
 x = np.linspace(-L[0]/2, L[0]/2, N[0])
-k = 200
-V = 1/2*k*x**2
-H.set_static_potential(V)
+
+def V(t):
+    k = 200
+    return 1/2*(k+t)*x**2
+H.set_potential(V)
+
 
 # Solve the system
-energies, states = H.eigen(n)
+energies, states = H.eigen(n,t=1000)
 
 # Plot results
 from matplotlib import pyplot as plt

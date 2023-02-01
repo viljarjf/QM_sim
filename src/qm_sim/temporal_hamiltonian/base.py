@@ -36,6 +36,8 @@ class BaseTemporalHamiltonian(ABC):
 
         self.H0 = H0
         self.Vt = Vt
+        # Since there is no reason for original H to not be time dep
+        self.H0.set_potential(Vt)
         
         if dt is None:
             self.dt = self._get_dt()
@@ -77,8 +79,8 @@ class BaseTemporalHamiltonian(ABC):
         # TODO: perform the vN analysis for each scheme
         # (i.e. make this func abstract)
         # NOTE: this assumes the temporal part is at most 4x the static part
-        V_max = np.max(self.H0.V0 * 4)
-        V_min = np.min(self.H0.V0 * 4)
+        V_max = np.max(self.H0.get_V() * 4)
+        V_min = np.min(self.H0.get_V() * 4)
 
         E_max = max(
             abs(V_min),
@@ -108,10 +110,3 @@ class BaseTemporalHamiltonian(ABC):
     
     def get_t(self) -> np.ndarray:
         return np.array(self.t)
-    
-    def get_Vt(self) -> np.ndarray:
-        return np.array(self.V)
-
-    def get_V(self) -> np.ndarray:
-        Vt = np.array(self.V)
-        return self.H0.V0 + Vt
