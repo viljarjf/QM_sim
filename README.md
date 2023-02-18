@@ -30,6 +30,10 @@ To contribute, please open a pull request to the `dev`-branch on [GitHub](https:
 
 The following is an example of how to set up VS Code for development, adapt to your IDE of choice.
 
+TL;DR: 
+- `pip install -e .` to install in an editable state
+- `pip install .` to (re)compile the C++ (subsequent python file edits will not be recognized before another reinstall)
+
 ### Requirements
 - VS Code
     - Python extension
