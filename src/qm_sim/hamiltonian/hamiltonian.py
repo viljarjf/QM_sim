@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from qm_sim import nature_constants as const
 from .spatial_derivative.cartesian import laplacian
-from .temporal_derivative import get_temporal_scheme, TemporalDerivative
+from .temporal_derivative import get_temporal_solver, TemporalDerivative
 
 
 class Hamiltonian:
@@ -87,7 +87,7 @@ class Hamiltonian:
 
         self.verbose = verbose
 
-        self._temporal_solver = get_temporal_scheme(temporal_scheme)(self)
+        self._temporal_solver = get_temporal_solver(temporal_scheme)(self)
 
 
     def set_potential(self, V: np.ndarray | Callable[[float], np.ndarray]):

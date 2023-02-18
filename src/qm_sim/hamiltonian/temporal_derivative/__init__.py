@@ -10,7 +10,7 @@ _SCHEMES = [
 ]
 _SCHEME_NAMES = [s.name for s in _SCHEMES]
 
-def get_temporal_scheme(scheme: str) -> TemporalDerivative:
+def get_temporal_solver(scheme: str) -> TemporalDerivative:
     if scheme in _SCHEME_NAMES:
         return _SCHEMES[_SCHEME_NAMES.index(scheme)]
     raise ValueError(f"Scheme {scheme} not found." 
