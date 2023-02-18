@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse.linalg import spsolve
+from tqdm import tqdm
 
 from ..nature_constants import h_bar
 from .base import BaseTemporalHamiltonian
@@ -24,7 +25,7 @@ class CrankNicolson(BaseTemporalHamiltonian):
         I = np.ones(self.H0.N).flatten()
 
         psi_n = self.psi_0
-
+        pbar = tqdm(desc="Crank-Nicholson solver", total=t, disable=not self.H0.verbose)
         while tn < t:
 
             # psi^n+1 = psi^n-1 + dt/2*(F^n + F^n-1)
@@ -43,3 +44,4 @@ class CrankNicolson(BaseTemporalHamiltonian):
                 self.psi.append(psi_n)
                 self.t.append(tn)
                 self.V.append(Vt(tn))
+            pbar.update(tn)

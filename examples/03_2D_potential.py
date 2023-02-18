@@ -24,7 +24,7 @@ V[
 ] = 0
 
 H.set_potential(V)
-print(V)
+
 # Solve the system
 energies, states = H.eigen(n)
 

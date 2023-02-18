@@ -19,7 +19,7 @@ steps = 100
 H = Hamiltonian(N, L, m)
 
 # Set potential. Here, a square well is used, with dV = 0.15 eV
-x,y = np.linspace(-L[0]/2,L[0]/2, s), np.linspace(-L[0]/2,L[0]/2, s)
+x,y = np.linspace(-L[0]/2,L[0]/2, N[0]), np.linspace(-L[0]/2,L[0]/2, N[1])
 X, Y = np.meshgrid(x,y)
 
 # Smoothed rectangular time-dependent potential, assymetric to avoid degeneracy 
@@ -56,6 +56,3 @@ def update(j):
 
 anim = FuncAnimation(fig, func=update, init_func=init, frames=steps, interval=50, blit=False, repeat = True, repeat_delay = 1000)
 plt.show()
-
-
-

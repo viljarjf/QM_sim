@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from .base import BaseTemporalHamiltonian
 from ..nature_constants import h_bar
 
@@ -27,6 +29,7 @@ class Leapfrog(BaseTemporalHamiltonian):
 
         steps = 0
         tn = 0
+        pbar = tqdm(desc="Leapfrog solver", total=t, disable=not self.H0.verbose)
         while tn < t:
             steps += 1
 
@@ -45,3 +48,4 @@ class Leapfrog(BaseTemporalHamiltonian):
                 self.psi.append(psi_1)
                 self.t.append(tn)
                 self.V.append(Vt(tn))
+            pbar.update(tn)
