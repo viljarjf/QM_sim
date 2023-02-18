@@ -6,12 +6,15 @@ from typing import Callable
 from tqdm import tqdm
 
 from qm_sim import nature_constants as const
-from qm_sim import finite_difference
+from .spatial_derivative.cartesian import laplacian
+from .temporal_derivative import get_temporal_scheme, TemporalDerivative
 
 
 class Hamiltonian:
 
-    def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, fd_scheme: str = "three-point", verbose : bool = True):
+    def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, 
+    spatial_scheme: str = "three-point", temporal_scheme: str = "leapfrog",
+    verbose: bool = True):
         """Discrete hamiltonian of a system
 
         Args:
@@ -23,14 +26,20 @@ class Hamiltonian:
                 Mass of the particle in the system. 
                 Can be constant (float) or vary in the simulation area (array).
                 If an array is used, `m.shape == N` must hold
-            fd_scheme (str, optional): 
-                Finite difference scheme. 
+            spatial_scheme (str, optional): 
+                Finite difference scheme for spatial derivative. 
                 Options are: 
-                    - "three-point"
-                    - "five-point"
-                    - "seven-point"
-                    - "nine-point"
+                    - three-point
+                    - five-point
+                    - seven-point
+                    - nine-point
                 Defaults to "three-point".
+            temporal_scheme (str, optional):
+                Finite difference scheme for temporal derivative.
+                Options are:
+                    - crank-nicolson
+                    - leapfrog
+                Defaults to "leapfrog"
             verbose (bool):
                 Option to display calculation and iteration info during runtime
                 True by default.
@@ -54,18 +63,15 @@ class Hamiltonian:
             self.m = max(m)
         else:
             self.m = m
-        
-        scheme_order = {
-            "three-point": 2,
-            "five-point": 4,
-            "seven-point": 6,
-            "nine-point": 8,
-        }
-        order = scheme_order.get(fd_scheme)
+                
+        # TODO fetch requested convergence order
+        order = 2
+
         if order is None:
             raise ValueError("Requested finite difference is invalid")
-        self.mat = finite_difference.nabla_squared(N, L, order)
+        self.mat = laplacian(N, L, order)
         self._centerline_index = list(self.mat.offsets).index(0)
+        self._default_data = None
 
         # Prefactor in hamiltonian.
         # Is either float or array, depending on `m`
@@ -80,6 +86,8 @@ class Hamiltonian:
         self.__V_timedep = False
 
         self.verbose = verbose
+
+        self._temporal_solver = get_temporal_scheme(temporal_scheme)(self)
 
 
     def set_potential(self, V: np.ndarray | Callable[[float], np.ndarray]):
@@ -103,7 +111,6 @@ class Hamiltonian:
         if self.__V_timedep:
             return self.V(t)
         return self.V
-
 
     def adiabatic_evolution(self, E_n: float, t0: float, dt : float, steps: int) -> tuple[np.ndarray, np.ndarray]:
         """Adiabatically evolve an eigenstate with a slowly varying time-dependent potential with
@@ -132,30 +139,45 @@ class Hamiltonian:
         if not self.__V_timedep:
             raise RuntimeError("Hamiltonian needs to be time-dependent for method to be meaingful.")
         
-        Psi_t = np.empty(shape = (self.N[0],self.N[1],steps+1))
+        Psi_t = np.empty(shape = (*self.N,steps+1))
         En_t = np.empty(steps+1)
+        t = t0
 
-        for i in tqdm(range(steps+1), desc="Adiabatic evolution", disable=not self.verbose):
-            H = self.mat.copy()
-            H.data[self._centerline_index, :] += self.V(t0+i*dt).flatten()
-            
+        # initialize
+        _, Psi_t[:, :, 0] = self._get_eigen(1, t, sigma=E_n)
+        En_t[0] = E_n
+
+        for i in tqdm(range(1, steps+1), desc="Adiabatic evolution", disable=not self.verbose):
+            t += dt
             En_t[i], psi = eigsh(
-                A=H,
+                A=self + self.get_V(t),
                 k=1,
                 # smartly condition eigsolver to "hug" the single eigenvalue solution; eigenvector and eigenvalue should be
                 # far closer to the previous one than any other if the adiabatic theorem is fulfilled
-                sigma=En_t[i-1] if i != 0 else E_n,
-                v0=-Psi_t[:,:,i-1] if i != 0 else np.ones(shape = self.N).flatten() # minus preserves vector sign, for some reason
+                sigma=En_t[i-1],
+                v0=Psi_t[:,:,i-1]
             )
-            Psi_t[:,:,i] = psi[:].reshape(self.N[::-1]).T
+            Psi_t[:,:,i] = psi[:].reshape(self.N, order="F")
         return En_t, Psi_t
 
-
-    def __add__(self, other: np.ndarray) -> dia_matrix:
-            self.mat.data = self._default_data.copy()
-            self.mat.data[self._centerline_index, :] += other.flatten()
-            return self.mat
+    def temporal_evolution(self, t_final: float, dt: float = None) -> tuple[np.ndarray, np.ndarray]:
+        return self._temporal_solver.iterate(t_final, dt)
+    temporal_evolution.__doc__ = TemporalDerivative.iterate.__doc__
     
+    def __add__(self, other: np.ndarray) -> dia_matrix:
+        if self._default_data is None:
+            self._default_data = self.mat.data.copy()
+    
+        self.mat.data = self._default_data.copy()
+        self.mat.data[self._centerline_index, :] += other.flatten()
+        return self.mat
+    
+    def __call__(self, t: float) -> dia_matrix:
+        return self + self.get_V(t)
+    
+    @property
+    def shape(self):
+        return self.N
 
     def __matmul__(self, other):
         return self.mat @ other
@@ -163,6 +185,18 @@ class Hamiltonian:
     
     def asarray(self) -> np.array:
         return self.mat.toarray()
+    
+    def _get_eigen(self, n: int, t: float, sigma: float = None) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Calculate eigenvalues and eigenstates at time `t`.
+        Might refactor this in the future to make it easier to change the solver
+        """
+        E, psi = eigsh(self + self.get_V(t), k=n, which="SA", sigma=sigma)
+
+        # Reshape into system shape.
+        # Arrays returned from eigsh are fortran ordered
+        psi = np.array([psi[:, i].reshape(self.N, order="F") for i in range(n)])
+        return E, psi
 
 
     def eigen(self, n: int, t: float = 0) -> tuple[np.ndarray, np.ndarray]:
@@ -180,18 +214,8 @@ class Hamiltonian:
             np.ndarray:
                 Normalised eigenstates, shape (n, *N) for a system with shape N
         """
-        # set initial conditions
-        if self.__V_timedep:
-            Vt = self.V(t)
-        else:
-            Vt = self.V
 
-        H = self.mat.copy()
-        H.data[self._centerline_index, :] += Vt.flatten()
-        self._default_data = H.copy()
-
-        E, psi = eigsh(H, k=n, which="SA")
-        psi = np.array([psi[:, i].reshape(self.N[::-1]).T for i in range(n)])
+        E, psi = self._get_eigen(n, t)
 
         # calculate normalisation factor
         nf = [psi[i, :]**2 for i in range(n)]
