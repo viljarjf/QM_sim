@@ -4,7 +4,7 @@ Use the scipy backend eigen solver to skip some overhead
 
 """
 from scipy._lib._threadsafety import ReentrancyLock
-from scipy.sparse.linalg._eigen.arpack.arpack import _SymmetricArpackParams, _UnsymmetricArpackParams
+from scipy.sparse.linalg._eigen.arpack.arpack import _SymmetricArpackParams
 
 
 def eigsh(A_OP, n, dtype, k=6, sigma=None, which='LA', v0=None,
