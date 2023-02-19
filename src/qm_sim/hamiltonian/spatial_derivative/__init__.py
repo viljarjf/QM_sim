@@ -4,3 +4,6 @@ _SCHEMES = {
     "seven-point": 6,
     "nine-point": 8,
 }
+
+def get_scheme_order(scheme: str) -> int | None:
+    return _SCHEMES.get(scheme)

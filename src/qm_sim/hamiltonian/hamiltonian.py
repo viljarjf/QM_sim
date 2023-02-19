@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 from qm_sim import nature_constants as const
 from .spatial_derivative.cartesian import laplacian
+from .spatial_derivative import get_scheme_order
 from .temporal_derivative import get_temporal_solver, TemporalDerivative
 
 
@@ -64,9 +65,7 @@ class Hamiltonian:
         else:
             self.m = m
                 
-        # TODO fetch requested convergence order
-        order = 2
-
+        order = get_scheme_order(spatial_scheme)
         if order is None:
             raise ValueError("Requested finite difference is invalid")
         self.mat = laplacian(N, L, order)
