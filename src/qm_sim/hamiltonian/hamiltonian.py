@@ -155,7 +155,7 @@ class Hamiltonian:
                 # smartly condition eigsolver to "hug" the single eigenvalue solution; eigenvector and eigenvalue should be
                 # far closer to the previous one than any other if the adiabatic theorem is fulfilled
                 sigma=En_t[i-1],
-                v0=Psi_t[:,:,i-1]
+                v0=-Psi_t[:,:,i-1]
             )
             Psi_t[:,:,i] = psi[:].reshape(self.N, order="F")
         return En_t, Psi_t
