@@ -2,11 +2,11 @@ import numpy as np
 from scipy.sparse.linalg import spsolve
 from tqdm import tqdm
 
-from ..nature_constants import h_bar
-from .base import BaseTemporalHamiltonian
+from ...nature_constants import h_bar
+from .base import BaseTemporalDerivative
 
 
-class CrankNicolson(BaseTemporalHamiltonian):
+class CrankNicolson(BaseTemporalDerivative):
     order = 2
     explicit = False
     stable = True
@@ -15,7 +15,7 @@ class CrankNicolson(BaseTemporalHamiltonian):
     def iterate(self, t: float, dt_storage: float = None):
 
         dt = self.dt
-        H0 = self.H0
+        H0 = self.H
         prefactor = dt/(2j * h_bar)
         H = prefactor * H0
         Vt = self.Vt
@@ -32,7 +32,7 @@ class CrankNicolson(BaseTemporalHamiltonian):
             # F^n = 1/ihbar * H^n @ psi^n
             # H^n = H0 + V^n
 
-            Hn = prefactor * (H0 + Vt(tn))
+            Hn = prefactor * H0(t)
 
             psi_n = spsolve(Hn - I, (H + I) @ psi_n)
 

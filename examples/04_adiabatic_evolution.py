@@ -1,14 +1,12 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-
-from scipy.special import expit
-from qm_sim.hamiltonian import Hamiltonian
-from qm_sim.nature_constants import m_e, e_0
-
 import numpy as np
+from matplotlib.animation import FuncAnimation
+from scipy.special import expit
 
-s = 200
+from qm_sim.hamiltonian import Hamiltonian
+from qm_sim.nature_constants import e_0, m_e
+
+s = 100
 N = (s, s)              # Discretisation point count
 L = (8e-9, 8e-9)        # System size in meters
 m = m_e                 # Mass of the particle, here chosen as electron mass
