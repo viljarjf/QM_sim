@@ -1,4 +1,4 @@
 try:
     from .eigen_wrapper import *
 except ImportError:
-    print("Warning: Eigen C++ module not found")
+    print("Warning: eigen_wrapper C++ module not found")
