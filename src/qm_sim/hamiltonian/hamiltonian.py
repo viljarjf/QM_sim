@@ -1,7 +1,7 @@
 
 import numpy as np
 from scipy.sparse import dia_matrix
-from scipy.sparse.linalg import eigsh
+from scipy.sparse.linalg import eigsh as scipy_eigsh
 from typing import Callable
 from tqdm import tqdm
 
@@ -9,6 +9,7 @@ from qm_sim import nature_constants as const
 from .spatial_derivative.cartesian import laplacian
 from .spatial_derivative import get_scheme_order
 from .temporal_derivative import get_temporal_solver, TemporalDerivative
+from .eigsh import eigsh
 
 
 class Hamiltonian:
@@ -148,15 +149,12 @@ class Hamiltonian:
 
         for i in tqdm(range(1, steps+1), desc="Adiabatic evolution", disable=not self.verbose):
             t += dt
-            En_t[i], psi = eigsh(
-                A=self(t),
-                k=1,
+            En_t[i], Psi_t[:,:,i] = self._get_eigen( 1, t,
                 # smartly condition eigsolver to "hug" the single eigenvalue solution; eigenvector and eigenvalue should be
                 # far closer to the previous one than any other if the adiabatic theorem is fulfilled
                 sigma=En_t[i-1],
                 v0=-Psi_t[:,:,i-1]
             )
-            Psi_t[:,:,i] = psi[:].reshape(self.N, order="F")
         return En_t, Psi_t
 
     def temporal_evolution(self, t_final: float, dt: float = None) -> tuple[np.ndarray, np.ndarray]:
@@ -178,19 +176,32 @@ class Hamiltonian:
     def shape(self):
         return self.N
 
+    @property
+    def N_total(self) -> int:
+        i = 1
+        for j in self.N:
+            i *= j
+        return i
+
     def __matmul__(self, other):
         return self.mat @ other
     
+    def _fast_matmul_op(self, t: float = 0):
+        mat = self(t)
+        return mat._mul_vector
     
     def asarray(self) -> np.array:
         return self.mat.toarray()
     
-    def _get_eigen(self, n: int, t: float, sigma: float = None) -> tuple[np.ndarray, np.ndarray]:
+    def _get_eigen(self, n: int, t: float, **kwargs) -> tuple[np.ndarray, np.ndarray]:
         """
         Calculate eigenvalues and eigenstates at time `t`.
-        Might refactor this in the future to make it easier to change the solver
         """
-        E, psi = eigsh(self(t), k=n, which="SA", sigma=sigma)
+        if kwargs.get("sigma") is None:
+            E, psi = eigsh(self._fast_matmul_op(t), self.N_total, 
+                self.mat.dtype, which="SA", k=n, **kwargs)
+        else:
+            E, psi = scipy_eigsh(self(t), k=n, **kwargs)
 
         # Reshape into system shape.
         # Arrays returned from eigsh are fortran ordered
