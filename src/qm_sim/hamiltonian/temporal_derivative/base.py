@@ -7,12 +7,16 @@ if TYPE_CHECKING:
     from ..hamiltonian import Hamiltonian
 from ...nature_constants import h_bar
 
+_SCHEMES = {}
+
 class BaseTemporalDerivative(ABC):
 
     name: str
     order: int
     explicit: bool
     stable: bool
+
+    _skip_registration: bool = False
 
     def __init__(self, H: "Hamiltonian", v_0: np.ndarray = None, dt: float = None):
         """
@@ -97,3 +101,19 @@ class BaseTemporalDerivative(ABC):
                 State at times stored in the other output. shape (n, H.shape)
         """
         pass
+
+    def __init_subclass__(cls):
+        if cls._skip_registration:
+            return
+        # Register new subclasses of TemporalDerivative
+        if _SCHEMES.get(cls.name) is None:
+            _SCHEMES[cls.name] = cls
+        else:
+            raise ValueError("Cannot have two schemes with the same name")
+
+
+def get_temporal_solver(scheme: str) -> BaseTemporalDerivative:
+    if scheme in _SCHEMES.keys():
+        return _SCHEMES[scheme]
+    raise ValueError(f"Scheme {scheme} not found. Options are:\n" 
+        + "\n".join(_SCHEMES.keys()))
