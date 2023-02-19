@@ -9,7 +9,7 @@ import sys, pathlib
 def main(module_name: str):
     path = pathlib.Path(__file__).parent.parent
     with open(path / "__init__.py", "w") as file:
-        file.write(f""""try:
+        file.write(f"""try:
     from .{module_name} import *
 except ImportError:
     print("Warning: {module_name} C++ module not found")""")
