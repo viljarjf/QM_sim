@@ -2,9 +2,11 @@
 import numpy as np
 from scipy import sparse as sp
 
-def nabla(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matrix:
+
+def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:
     """
-    Finite difference derivative in cartesian coordinates
+    Finite difference derivative in cartesian coordinates.
+    Uses central stencil.
 
     Args:
         N (tuple): 
@@ -19,6 +21,9 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matrix:
                 - 6
                 - 8
             Defaults to 2.
+        dtype (type, optional):
+            datatype of matrix. 
+            Defaults to float64
 
     Example:
 
@@ -53,12 +58,13 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matrix:
     stencil += [0]
     indices = _mirror_sign_list([-i for i in range(len(stencil))][::-1])
     stencil = _mirror_sign_list(stencil)
-    return _matrix_from_stencil(stencil, indices, 1, N, L)
+    return _matrix_from_stencil(stencil, indices, 1, N, L, dtype)
 
 
-def nabla_squared(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matrix:
+def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:
     """
-    Finite difference double derivative in cartesian coordinates
+    Finite difference double derivative in cartesian coordinates.
+    Uses central stencil
 
     Args:
         N (tuple): 
@@ -73,6 +79,9 @@ def nabla_squared(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matr
                 - 6
                 - 8
             Defaults to 2.
+        dtype (type, optional):
+            datatype of matrix. 
+            Defaults to float64
 
     Example:
 
@@ -81,7 +90,7 @@ def nabla_squared(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matr
         >>> import numpy as np
         >>> N = (1000,)
         >>> L = (2*np.pi,)
-        >>> n = finite_difference.nabla_squared( N, L )
+        >>> n = finite_difference.laplacian( N, L )
         >>> x = np.linspace( 0, L[0], N[0] )
         >>> y = np.sin(x)
         
@@ -104,10 +113,11 @@ def nabla_squared(N: tuple[int], L: tuple[float], order: int = 2) -> sp.dia_matr
     
     indices = _mirror_sign_list([-i for i in range(len(stencil))][::-1])
     stencil = _mirror_list(stencil)
-    return _matrix_from_stencil(stencil, indices, 2, N, L)
+    return _matrix_from_stencil(stencil, indices, 2, N, L, dtype)
     
 
-def _matrix_from_stencil(stencil: list[float], indices: list[int], power: int, N: tuple[int], L: tuple[float]) -> sp.dia_matrix:
+def _matrix_from_stencil(stencil: list[float], indices: list[int], 
+    power: int, N: tuple[int], L: tuple[float], dtype: type) -> sp.dia_matrix:
     """
     Creates a full matrix from a stencil and its corresponding indices.
     """
@@ -125,7 +135,7 @@ def _matrix_from_stencil(stencil: list[float], indices: list[int], power: int, N
             stencil,
             indices * prev_N,
             shape=(N * prev_N, N * prev_N),
-            dtype=np.float64,
+            dtype=dtype,
             format="dia"
             )
         
@@ -153,4 +163,3 @@ def _mirror_sign_list(l: list) -> list:
     Example: [-a, b, c] -> [-a, b, c, -b, a]
     """
     return l + [-i for i in l[-2::-1]]
-
