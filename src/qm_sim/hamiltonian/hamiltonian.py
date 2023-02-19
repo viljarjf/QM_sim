@@ -149,7 +149,7 @@ class Hamiltonian:
         for i in tqdm(range(1, steps+1), desc="Adiabatic evolution", disable=not self.verbose):
             t += dt
             En_t[i], psi = eigsh(
-                A=self + self.get_V(t),
+                A=self(t),
                 k=1,
                 # smartly condition eigsolver to "hug" the single eigenvalue solution; eigenvector and eigenvalue should be
                 # far closer to the previous one than any other if the adiabatic theorem is fulfilled
@@ -190,7 +190,7 @@ class Hamiltonian:
         Calculate eigenvalues and eigenstates at time `t`.
         Might refactor this in the future to make it easier to change the solver
         """
-        E, psi = eigsh(self + self.get_V(t), k=n, which="SA", sigma=sigma)
+        E, psi = eigsh(self(t), k=n, which="SA", sigma=sigma)
 
         # Reshape into system shape.
         # Arrays returned from eigsh are fortran ordered
