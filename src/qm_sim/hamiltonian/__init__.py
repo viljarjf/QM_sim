@@ -216,7 +216,9 @@ class Hamiltonian:
         psi = np.array([psi[:, i].reshape(self.N, order="F") for i in range(n)])
         return E, psi
     
-from .hamiltonian import Hamiltonian
+    def plot_eigen(self, n: int, t: float = 0):
+        plot.plot_eigen(self, n, t)
+    plot_eigen.__doc__ = plot.plot_eigen.__doc__
 
     def __add__(self, other: np.ndarray) -> dia_matrix:
         if self._default_data is None:
