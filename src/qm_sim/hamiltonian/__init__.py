@@ -45,8 +45,6 @@ class Hamiltonian:
                 Option to display calculation and iteration info during runtime
                 True by default.
         """
-        print("Hamiltonian.__init__")
-
         if len(N) != len(L):
             raise ValueError("`N` and `L` must have same length")
         
@@ -89,10 +87,6 @@ class Hamiltonian:
         self.verbose = verbose
 
         self._temporal_solver = get_temporal_solver(temporal_scheme)(self)
-        print(2)
-        # Dict to store some solutions
-        self._stored_solutions: dict[tuple[int, float], tuple[np.ndarray, np.ndarray]] = {}
-        print(4)
 
     def set_potential(self, V: np.ndarray | Callable[[float], np.ndarray]):
         """Set a (potentially time dependent) potential for the QM-system's Hamiltonian
@@ -133,10 +127,6 @@ class Hamiltonian:
             np.ndarray:
                 Normalised eigenstates, shape (n, *N) for a system with shape N
         """
-        # Check if we need to recalculate
-        if (sol := self._stored_solutions.get(n, t)) is not None:
-            return sol
-
         E, psi = self._get_eigen(n, t)
 
         # calculate normalisation factor
@@ -148,8 +138,6 @@ class Hamiltonian:
         # normalise
         for i in range(n):
             psi[i] /= nf[i]**0.5
-        # Store solution
-        self._stored_solutions[(n, t)] = (E, psi)
         return E, psi
 
     def adiabatic_evolution(self, E_n: float, t0: float, dt : float, steps: int) -> tuple[np.ndarray, np.ndarray]:
@@ -219,6 +207,10 @@ class Hamiltonian:
     def plot_eigen(self, n: int, t: float = 0):
         plot.plot_eigen(self, n, t)
     plot_eigen.__doc__ = plot.plot_eigen.__doc__
+
+    def plot_temporal(self, t_final: float, dt: float):
+        plot.plot_temporal(self, t_final, dt)
+    plot_temporal.__doc__ = plot.plot_temporal.__doc__
 
     def __add__(self, other: np.ndarray) -> dia_matrix:
         if self._default_data is None:
