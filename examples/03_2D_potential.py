@@ -24,5 +24,8 @@ V[
 ] = 0
 H.set_potential(V)
 
+# Plot potential
+H.plot_potential()
+
 # Plot eigenstate
 H.plot_eigen(n)

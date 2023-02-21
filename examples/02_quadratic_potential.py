@@ -24,5 +24,6 @@ def V(t):
     return 1/2*(k+t)*x**2
 H.set_potential(V)
 
-# Plot eigenstate
+# Plot
+H.plot_potential()
 H.plot_eigen(n)
