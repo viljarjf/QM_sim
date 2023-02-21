@@ -86,7 +86,7 @@ class Hamiltonian:
 
         self.verbose = verbose
 
-        self._temporal_solver = get_temporal_solver(temporal_scheme)(self)
+        self._temporal_solver = get_temporal_solver(temporal_scheme)
 
     def set_potential(self, V: np.ndarray | Callable[[float], np.ndarray]):
         """Set a (potentially time dependent) potential for the QM-system's Hamiltonian
@@ -185,8 +185,9 @@ class Hamiltonian:
             )
         return En_t, Psi_t
 
-    def temporal_evolution(self, t_final: float, dt: float = None) -> tuple[np.ndarray, np.ndarray]:
-        return self._temporal_solver.iterate(t_final, dt)
+    def temporal_evolution(self, t_final: float, dt: float = None, 
+        psi_0: np.ndarray = None) -> tuple[np.ndarray, np.ndarray]:
+        return self._temporal_solver(self, psi_0, dt).iterate(t_final, dt)
     temporal_evolution.__doc__ = TemporalDerivative.iterate.__doc__
     
     def _get_eigen(self, n: int, t: float, **kwargs) -> tuple[np.ndarray, np.ndarray]:
@@ -208,8 +209,8 @@ class Hamiltonian:
         plot.plot_eigen(self, n, t)
     plot_eigen.__doc__ = plot.plot_eigen.__doc__
 
-    def plot_temporal(self, t_final: float, dt: float):
-        plot.plot_temporal(self, t_final, dt)
+    def plot_temporal(self, t_final: float, dt: float, psi_0: np.ndarray = None):
+        plot.plot_temporal(self, t_final, dt, psi_0)
     plot_temporal.__doc__ = plot.plot_temporal.__doc__
 
     def plot_potential(self, t: float = 0):

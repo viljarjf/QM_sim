@@ -8,7 +8,7 @@ import numpy as np
 
 from ..nature_constants import e_0
 
-def get_plot_fun(ndim: int, ax: plt.Axes = None):
+def _get_plot_fun(ndim: int, ax: plt.Axes = None):
     if ax is None:
         ax = plt
 
@@ -55,7 +55,7 @@ def plot_eigen(self: "Hamiltonian", n: int, t: float):
     from matplotlib import pyplot as plt
     plt.figure()
     plt.suptitle("$|\Psi|^2$")
-    plot = get_plot_fun(self.ndim)
+    plot = _get_plot_fun(self.ndim)
     for i in range(n):
         plt.subplot(*shape, i+1)
         plt.title(f"E{i} = {E[i] / e_0 :.3f} eV")
@@ -63,7 +63,7 @@ def plot_eigen(self: "Hamiltonian", n: int, t: float):
     plt.tight_layout()
     plt.show()
 
-def plot_temporal(self: "Hamiltonian", t_final: float, dt: float):
+def plot_temporal(self: "Hamiltonian", t_final: float, dt: float, psi_0: np.ndarray = None):
     """Animate the temporal evolution
 
     Args:
@@ -74,7 +74,7 @@ def plot_temporal(self: "Hamiltonian", t_final: float, dt: float):
             Note that the solver uses its own timestep.
     """
     # Calculate the temporal evolution
-    t, psi = self.temporal_evolution(t_final, dt)
+    t, psi = self.temporal_evolution(t_final, dt, psi_0)
 
     # Get potential at each timestep
     V = np.array([self.get_V(tn) for tn in t])
@@ -84,8 +84,8 @@ def plot_temporal(self: "Hamiltonian", t_final: float, dt: float):
 
     # Plot the results
     fig, (ax1, ax2) = plt.subplots(2, 1)
-    ax1_plot = get_plot_fun(self.ndim, ax1)
-    ax2_plot = get_plot_fun(self.ndim, ax2)
+    ax1_plot = _get_plot_fun(self.ndim, ax1)
+    ax2_plot = _get_plot_fun(self.ndim, ax2)
 
     psi_plot, = ax1_plot(psi[0, :])
     V_plot, = ax2_plot(V[0, :] / e_0)
@@ -118,6 +118,6 @@ def plot_potential(self: "Hamiltonian", t: float = 0):
         t (float, optional): time at which to plot. Defaults to 0.
     """
     plt.figure()
-    get_plot_fun(self.ndim)(self.get_V(t) / e_0)
+    _get_plot_fun(self.ndim)(self.get_V(t) / e_0)
     plt.title("Potential [eV]")
     plt.show()

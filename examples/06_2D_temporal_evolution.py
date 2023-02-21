@@ -31,15 +31,15 @@ def V(theta: float) -> np.ndarray:
     kernel = np.ones((n,n)) / n**2
     V = convolve2d(V, kernel, mode="same", boundary="wrap")
     return V
+    
 H.set_potential(lambda t: V(1e14*t))
 
-# Set initial condition manually to a
+# Set initial condition to a
 # superposition of third and fourth eigenstate
 _, psi = H.eigen(4)
 psi_0 = 1/2**0.5 * (psi[2] + psi[3])
-H._temporal_solver.v_0 = psi_0
 
 # Plot
 H.plot_potential()
 H.plot_eigen(4)
-H.plot_temporal(t_end, dt)
+H.plot_temporal(t_end, dt, psi_0)
