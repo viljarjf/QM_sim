@@ -212,6 +212,10 @@ class Hamiltonian:
         plot.plot_temporal(self, t_final, dt)
     plot_temporal.__doc__ = plot.plot_temporal.__doc__
 
+    def plot_potential(self, t: float = 0):
+        plot.plot_potential(self, t)
+    plot_potential.__doc__ = plot.plot_potential.__doc__
+
     def __add__(self, other: np.ndarray) -> dia_matrix:
         if self._default_data is None:
             self._default_data = self.mat.data.copy()
@@ -233,6 +237,10 @@ class Hamiltonian:
         for j in self.N:
             i *= j
         return i
+    
+    @property
+    def ndim(self):
+        return len(self.N)
 
     def __matmul__(self, other):
         return self.mat @ other

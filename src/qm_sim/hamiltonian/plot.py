@@ -3,7 +3,7 @@ if TYPE_CHECKING:
     from . import Hamiltonian
 
 from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import ArtistAnimation
 import numpy as np
 
 from ..nature_constants import e_0
@@ -13,14 +13,15 @@ def get_plot_fun(ndim: int, ax: plt.Axes = None):
         ax = plt
 
     if ndim == 1:
-        return ax.plot
+        return lambda *args, **kwargs: ax.plot(*args, c="b", **kwargs)
     elif ndim == 2:
-        return ax.imshow
+        # To preserve the return type of `plot` above
+        return lambda *args, **kwargs: [ax.imshow(*args, **kwargs)]
     elif ndim == 3:
         raise NotImplementedError("3D plots not yet supported")
     else:
         # It would be impressive if this is ever executed
-        raise ValueError(f"Invalid system dimensionality: {len(self.N)}D")
+        raise ValueError(f"Invalid system dimensionality: {self.ndim}D")
 
 def _shape_from_int(n: int) -> tuple[int, int]:
     """Get plot shape from n (plot count)"""
@@ -54,7 +55,7 @@ def plot_eigen(self: "Hamiltonian", n: int, t: float):
     from matplotlib import pyplot as plt
     plt.figure()
     plt.suptitle("$|\Psi|^2$")
-    plot = get_plot_fun(len(self.N))
+    plot = get_plot_fun(self.ndim)
     for i in range(n):
         plt.subplot(*shape, i+1)
         plt.title(f"E{i} = {E[i] / e_0 :.3f} eV")
@@ -83,30 +84,40 @@ def plot_temporal(self: "Hamiltonian", t_final: float, dt: float):
 
     # Plot the results
     fig, (ax1, ax2) = plt.subplots(2, 1)
-    ax1_plot = get_plot_fun(len(self.N), ax1)
-    ax2_plot = get_plot_fun(len(self.N), ax2)
+    ax1_plot = get_plot_fun(self.ndim, ax1)
+    ax2_plot = get_plot_fun(self.ndim, ax2)
 
     psi_plot, = ax1_plot(psi[0, :])
     V_plot, = ax2_plot(V[0, :] / e_0)
 
-    # get default x-data, for updating plots
-    z, _ = psi_plot.get_data()
-
-    def init():
-        ax1.set_title("$|\Psi|^2$, Leapfrog")
-        ax2.set_title("Potential [eV]")
+    ax1.set_title(f"$|\Psi|^2$")
+    ax2.set_title("Potential [eV]")
+    if self.ndim == 1:
         ax1.set_ylim(0, np.max(psi) * 1.1)
         ax2.set_ylim(np.min(V / e_0), np.max(V / e_0))
-        fig.tight_layout()
+    elif self.ndim == 2:
+        ax1.set_xticks([])
+        ax1.set_yticks([])
+        ax2.set_xticks([])
+        ax2.set_yticks([])
+    fig.tight_layout()
 
-    def frames():
-        for n in range(psi.shape[0]):
-            yield psi[n, :], V[n, :]
+    ims = [(psi_plot, V_plot)]
+    for n in range(psi.shape[0]):
+        psi_plot, = ax1_plot(psi[n, ...], animated=True)
+        V_plot, = ax2_plot(V[n, ...] / e_0, animated=True)
+        ims.append((psi_plot, V_plot,))
 
-    def update(data):
-        _psi, _V = data
-        psi_plot.set_data(z, _psi)
-        V_plot.set_data(z, _V / e_0)
+    ani = ArtistAnimation(fig, ims, blit=True, interval=50)
+    plt.show()
 
-    ani = FuncAnimation(fig, update, frames=frames, init_func=init, blit=False, interval=50)
+def plot_potential(self: "Hamiltonian", t: float = 0):
+    """Plot the potential at a given time
+
+    Args:
+        t (float, optional): time at which to plot. Defaults to 0.
+    """
+    plt.figure()
+    get_plot_fun(self.ndim)(self.get_V(t) / e_0)
+    plt.title("Potential [eV]")
     plt.show()
