@@ -1,6 +1,4 @@
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from . import Hamiltonian
+from typing import Callable
 
 from matplotlib import pyplot as plt
 from matplotlib.animation import ArtistAnimation
@@ -21,7 +19,7 @@ def _get_plot_fun(ndim: int, ax: plt.Axes = None):
         raise NotImplementedError("3D plots not yet supported")
     else:
         # It would be impressive if this is ever executed
-        raise ValueError(f"Invalid system dimensionality: {self.ndim}D")
+        raise ValueError(f"Invalid system dimensionality: {ndim}D")
 
 def _shape_from_int(n: int) -> tuple[int, int]:
     """Get plot shape from n (plot count)"""
@@ -43,19 +41,21 @@ def _shape_from_int(n: int) -> tuple[int, int]:
     }
     return shapes.get(n, (1,n))
 
-def plot_eigen(self: "Hamiltonian", n: int, t: float):
-    """Plot eigenvectors of hamiltonian. 
-    If not previously calculated, then calling this will calculate them
+
+def eigen(E: np.ndarray, psi: np.ndarray):
+    """Plot absolute square of wave function
 
     Args:
-        n (int): Amount of eigenstates to plot
+        E (np.ndarray): Eigenenergies
+        psi (np.ndarray): Eigenstates
     """
+    n = E.shape[0]
+    ndim = len(psi.shape) - 1
     shape = _shape_from_int(n)
-    E, psi = self.eigen(n, t)
-    from matplotlib import pyplot as plt
+    
     plt.figure()
     plt.suptitle("$|\Psi|^2$")
-    plot = _get_plot_fun(self.ndim)
+    plot = _get_plot_fun(ndim)
     for i in range(n):
         plt.subplot(*shape, i+1)
         plt.title(f"E{i} = {E[i] / e_0 :.3f} eV")
@@ -63,39 +63,37 @@ def plot_eigen(self: "Hamiltonian", n: int, t: float):
     plt.tight_layout()
     plt.show()
 
-def plot_temporal(self: "Hamiltonian", t_final: float, dt: float, psi_0: np.ndarray = None):
-    """Animate the temporal evolution
+
+def temporal(t: np.ndarray, psi: np.ndarray, Vt: Callable[[float], np.ndarray]):
+    """Create an animation of the wave function, alongside the potential
 
     Args:
-        t_final (float): 
-            Final simulation time
-        dt (float): 
-            Time between each simulation frame.
-            Note that the solver uses its own timestep.
+        t (np.ndarray): times corresponding to the wave functions
+        psi (np.ndarray): wave functions 
+        Vt (Callable[[float], np.ndarray]): Function that returns potential at the input time
     """
-    # Calculate the temporal evolution
-    t, psi = self.temporal_evolution(t_final, dt, psi_0)
+    ndim = len(psi.shape) - 1
 
     # Get potential at each timestep
-    V = np.array([self.get_V(tn) for tn in t])
+    V = np.array([Vt(tn) for tn in t])
 
     # We want to plot the probability distribution
-    psi = np.abs(psi)**2
+    psi2 = np.abs(psi)**2
 
     # Plot the results
     fig, (ax1, ax2) = plt.subplots(2, 1)
-    ax1_plot = _get_plot_fun(self.ndim, ax1)
-    ax2_plot = _get_plot_fun(self.ndim, ax2)
+    ax1_plot = _get_plot_fun(ndim, ax1)
+    ax2_plot = _get_plot_fun(ndim, ax2)
 
-    psi_plot, = ax1_plot(psi[0, :])
+    psi_plot, = ax1_plot(psi2[0, :])
     V_plot, = ax2_plot(V[0, :] / e_0)
 
     ax1.set_title(f"$|\Psi|^2$")
     ax2.set_title("Potential [eV]")
-    if self.ndim == 1:
-        ax1.set_ylim(0, np.max(psi) * 1.1)
+    if ndim == 1:
+        ax1.set_ylim(0, np.max(psi2) * 1.1)
         ax2.set_ylim(np.min(V / e_0), np.max(V / e_0))
-    elif self.ndim == 2:
+    elif ndim == 2:
         ax1.set_xticks([])
         ax1.set_yticks([])
         ax2.set_xticks([])
@@ -103,21 +101,22 @@ def plot_temporal(self: "Hamiltonian", t_final: float, dt: float, psi_0: np.ndar
     fig.tight_layout()
 
     ims = [(psi_plot, V_plot)]
-    for n in range(psi.shape[0]):
-        psi_plot, = ax1_plot(psi[n, ...], animated=True)
+    for n in range(psi2.shape[0]):
+        psi_plot, = ax1_plot(psi2[n, ...], animated=True)
         V_plot, = ax2_plot(V[n, ...] / e_0, animated=True)
         ims.append((psi_plot, V_plot,))
 
     ani = ArtistAnimation(fig, ims, blit=True, interval=50)
     plt.show()
 
-def plot_potential(self: "Hamiltonian", t: float = 0):
+
+def potential(V: np.ndarray):
     """Plot the potential at a given time
 
     Args:
-        t (float, optional): time at which to plot. Defaults to 0.
+        V (np.ndarray): Potential array
     """
     plt.figure()
-    _get_plot_fun(self.ndim)(self.get_V(t) / e_0)
+    _get_plot_fun(len(V.shape))(V / e_0)
     plt.title("Potential [eV]")
     plt.show()

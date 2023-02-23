@@ -3,12 +3,12 @@ from abc import ABC, abstractmethod
 import numpy as np
 from tqdm import tqdm
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from .. import Hamiltonian
+from typing import Callable
 from ...nature_constants import h_bar
 
+# Dict to store subclasses of BaseTemporalSolver
 _SCHEMES = {}
+
 
 class BaseTemporalSolver(ABC):
 
@@ -19,37 +19,24 @@ class BaseTemporalSolver(ABC):
 
     _skip_registration: bool = False
 
-    def __init__(self, H: "Hamiltonian", v_0: np.ndarray = None, dt: float = None):
+    def __init__(self, H: Callable[[float], np.ndarray], output_shape: tuple[int] = None):
         """
         Initialise a temporal solver
 
         Args:
-            H (Callable[[float], LinearOperator]): 
+            H (Callable[[float], np.ndarray]): 
                 Function of time, returning a linear operator 
                 representing the state function at that time.
-            v_0 (np.ndarray, optional): 
-                Initial condition.
-                If None, it is set from the stationary solutions of `H` at time 0.
-                Defaults to None
-            dt (float, optional): 
-                Time interval in the discretisation.
-                If None, it is estimated based on von Neumann analysis.
-                Defaults to None
         """
 
         self.H = H
-        
-        if dt is None:
-            self.dt = self._get_dt()
-        else:
-            self.dt = dt
-        
-        if v_0 is None:
-            v_0 = self._get_initial_condition()
-        self.v_0 = v_0
 
-    def tqdm(self, t: float) -> tqdm:
-        pbar = tqdm(desc=self.name + " solver", total=t, disable=not self.H.verbose)
+        if output_shape is None:
+            output_shape = self.H(0).shape
+        self.output_shape = output_shape
+
+    def tqdm(self, t_start: float, t_end: float, enable: bool) -> tqdm:
+        pbar = tqdm(desc=self.name + " solver", total=t_end - t_start, disable=not enable)
         pbar.bar_format = "{l_bar}{bar}| {n:#.02g}/{total:#.02g}"
 
         # Add func to update with t, not dt
@@ -58,40 +45,9 @@ class BaseTemporalSolver(ABC):
         return pbar
 
 
-    def _get_initial_condition(self) -> np.ndarray:
-        """Calculate a initial state from eigenstates of `H`
-
-        Returns:
-            np.ndarray: initial wave function
-        """
-        # Default initial condition:
-        # Equal superposition of the two lowest eigenstates
-        _, _psi = self.H.eigen(2)
-        return (_psi[0, :] + _psi[1, :]) * 2**-0.5
-
-        
-    def _get_dt(self) -> float:
-        """Calculate a decent `dt` for the given scheme,
-        using von Neumann analysis.
-
-        Returns:
-            float: time delta
-        """
-        # Just use the leapfrog analysis to begin with
-        # TODO: perform the vN analysis for each scheme
-        # (i.e. make this func abstract)
-        # NOTE: this assumes the temporal part is at most 4x the static part
-        V_max = np.max(self.H.get_V() * 4)
-        V_min = np.min(self.H.get_V() * 4)
-
-        E_max = max(
-            abs(V_min),
-            abs(V_max + 4 * h_bar**2 / (4*self.H.m * sum(d**2 for d in self.H.delta))),
-            )
-        return 0.25 * h_bar / E_max
-
     @abstractmethod
-    def iterate(self, t_final: float, dt_storage: float = None) -> tuple[np.ndarray, np.ndarray]:
+    def iterate(self, v_0: np.ndarray, t0: float, t_final: float, 
+        dt: float, dt_storage: float = None, verbose: bool = True) -> tuple[np.ndarray, np.ndarray]:
         """
         Iterate the time propagation scheme.
         Store the current state every `dt_storage`
@@ -122,7 +78,7 @@ class BaseTemporalSolver(ABC):
             raise ValueError("Cannot have two schemes with the same name")
 
 
-def get_temporal_solver(scheme: str) -> BaseTemporalSolver:
+def get_temporal_solver(scheme: str) -> type[BaseTemporalSolver]:
     if scheme in _SCHEMES.keys():
         return _SCHEMES[scheme]
     raise ValueError(f"Scheme {scheme} not found. Options are:\n" 

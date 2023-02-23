@@ -105,7 +105,7 @@ def test_temporal():
     t = []
     psi = []
     for Hi in H:
-        ti, psii = Hi.temporal_evolution(t_end, dt, psi_0)
+        ti, psii = Hi.temporal_evolution(0, t_end, dt, psi_0)
         t.append(ti)
         psi.append((abs(psii)**2).real)
 

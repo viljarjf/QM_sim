@@ -2,7 +2,6 @@ import numpy as np
 from scipy.integrate import solve_ivp
 from tqdm import tqdm
 
-from ...nature_constants import h_bar
 from .base import BaseTemporalSolver
 
 class ScipySolver(BaseTemporalSolver):
@@ -10,28 +9,27 @@ class ScipySolver(BaseTemporalSolver):
 
     _skip_registration = True
 
-    def iterate(self, t_final: float, dt_storage: float = None) -> tuple[np.ndarray, np.ndarray]:
-        v_0 = self.v_0.astype(np.complex128).flatten()
+    def iterate(self, v_0: np.ndarray, t0: float, t_final: float, 
+        dt: float, dt_storage: float = None, verbose: bool = True) -> tuple[np.ndarray, np.ndarray]:
         
-        pbar = self.tqdm(t_final)
+        pbar = self.tqdm(t0, t_final, verbose)
 
         # Precalculate the coefficient for negligible speedup
-        i_hbar_inv = 1 / (1j*h_bar)
 
         def ode_fun(t, y):
             pbar.progress(t)
-            return (self.H(t) @ y) * i_hbar_inv
+            return self.H(t) @ y
 
         sol = solve_ivp(
             ode_fun, 
-            [0, t_final], 
-            v_0, 
-            t_eval=np.arange(0, t_final, dt_storage),
-            first_step=self.dt,
+            [t0, t_final], 
+            v_0.flatten(), 
+            t_eval=np.arange(t0, t_final, dt_storage),
+            first_step=dt,
             method=self.method,
             )
         t = sol.t
-        psi = [sol.y[:, i].reshape(*self.H.shape) for i in range(len(t))]
+        psi = [sol.y[:, i].reshape(*self.output_shape) for i in range(len(t))]
 
         return t, np.array(psi)
     
