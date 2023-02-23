@@ -11,7 +11,6 @@ class ScipySolver(BaseTemporalDerivative):
     _skip_registration = True
 
     def iterate(self, t_final: float, dt_storage: float = None) -> tuple[np.ndarray, np.ndarray]:
-        if self.H.verbose:
         v_0 = self.v_0.astype(np.complex128).flatten()
         
         pbar = tqdm(desc=self.name + " solver", total=t_final, disable=not self.H.verbose)
