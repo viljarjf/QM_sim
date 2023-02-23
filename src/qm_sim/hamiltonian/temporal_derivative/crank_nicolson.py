@@ -21,6 +21,11 @@ class CrankNicolson(BaseTemporalDerivative):
     stable = True
     name = "crank-nicolson"
 
+    def __init__(self, H: "Hamiltonian", v_0: np.ndarray = None, dt: float = None):
+        if H.ndim != 1:
+            raise ValueError("Crank-Nicolson solver only supports 1D systems")
+        super().__init__(H, v_0, dt)
+
     def iterate(self, t_final: float, dt_storage: float = None):
 
         dt = self.dt
