@@ -1,11 +1,11 @@
 from tqdm import tqdm
 import numpy as np
 
-from .base import BaseTemporalDerivative
+from .base import BaseTemporalSolver
 from ...nature_constants import h_bar
 
 
-class Leapfrog(BaseTemporalDerivative):
+class Leapfrog(BaseTemporalSolver):
     order = 2
     explicit = True
     stable = True # conditionally stable, dt is chosen accordingly

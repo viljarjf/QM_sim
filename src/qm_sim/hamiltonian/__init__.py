@@ -7,7 +7,7 @@ from tqdm import tqdm
 from qm_sim import nature_constants as const
 from .spatial_derivative.cartesian import laplacian
 from .spatial_derivative import get_scheme_order
-from .temporal_derivative import get_temporal_solver, TemporalDerivative
+from .temporal_solver import get_temporal_solver, TemporalSolver
 from .eigsh import eigsh
 from . import plot
 
@@ -188,7 +188,7 @@ class Hamiltonian:
     def temporal_evolution(self, t_final: float, dt: float = None, 
         psi_0: np.ndarray = None) -> tuple[np.ndarray, np.ndarray]:
         return self._temporal_solver(self, psi_0).iterate(t_final, dt)
-    temporal_evolution.__doc__ = TemporalDerivative.iterate.__doc__
+    temporal_evolution.__doc__ = TemporalSolver.iterate.__doc__
     
     def _get_eigen(self, n: int, t: float, **kwargs) -> tuple[np.ndarray, np.ndarray]:
         """

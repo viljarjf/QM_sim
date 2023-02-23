@@ -10,7 +10,7 @@ from ...nature_constants import h_bar
 
 _SCHEMES = {}
 
-class BaseTemporalDerivative(ABC):
+class BaseTemporalSolver(ABC):
 
     name: str
     order: int
@@ -21,7 +21,7 @@ class BaseTemporalDerivative(ABC):
 
     def __init__(self, H: "Hamiltonian", v_0: np.ndarray = None, dt: float = None):
         """
-        Initialise a temporal derivative
+        Initialise a temporal solver
 
         Args:
             H (Callable[[float], LinearOperator]): 
@@ -115,14 +115,14 @@ class BaseTemporalDerivative(ABC):
     def __init_subclass__(cls):
         if cls._skip_registration:
             return
-        # Register new subclasses of TemporalDerivative
+        # Register new subclasses of TemporalSolver
         if _SCHEMES.get(cls.name) is None:
             _SCHEMES[cls.name] = cls
         else:
             raise ValueError("Cannot have two schemes with the same name")
 
 
-def get_temporal_solver(scheme: str) -> BaseTemporalDerivative:
+def get_temporal_solver(scheme: str) -> BaseTemporalSolver:
     if scheme in _SCHEMES.keys():
         return _SCHEMES[scheme]
     raise ValueError(f"Scheme {scheme} not found. Options are:\n" 
