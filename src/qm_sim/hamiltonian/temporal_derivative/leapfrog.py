@@ -30,8 +30,7 @@ class Leapfrog(BaseTemporalDerivative):
 
         psi = [psi_0.reshape(self.H.shape)]
         t = [tn]
-        with tqdm(desc="Leapfrog solver", total=t_final, disable=not self.H.verbose) as pbar:
-            pbar.bar_format = "{l_bar}{bar}| {n:#.02g}/{total:#.02g}"
+        with self.tqdm(t_final) as pbar:
             while tn < t_final:
                 steps += 1
 
@@ -43,8 +42,8 @@ class Leapfrog(BaseTemporalDerivative):
 
                 psi_0, psi_1 = psi_1, psi_2
 
-                tn += dt
                 pbar.update(dt)
+                tn += dt
 
                 # store data every `dt_storage` seconds
                 if tn // dt_storage > len(psi):
