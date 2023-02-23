@@ -24,17 +24,6 @@ def V(t):
     return 1/2*(k+t)*x**2
 H.set_potential(V)
 
-
-# Solve the system
-energies, states = H.eigen(n,t=1000)
-
-# Plot results
-from matplotlib import pyplot as plt
-plt.figure()
-plt.suptitle("$\Psi$")
-for i in range(n):
-    plt.subplot(2, 2, i+1)
-    plt.yticks([])
-    plt.plot(states[i].real)
-plt.tight_layout()
-plt.show()
+# Plot
+H.plot_potential()
+H.plot_eigen(n)

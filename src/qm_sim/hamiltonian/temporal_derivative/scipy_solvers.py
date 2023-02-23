@@ -10,10 +10,13 @@ class ScipySolver(BaseTemporalDerivative):
     _skip_registration = True
 
     def iterate(self, t_final: float, dt_storage: float = None) -> tuple[np.ndarray, np.ndarray]:
+        if self.H.verbose:
+            print("Warning: verbose option not available for scipy temporal solvers")
+        v_0 = self.v_0.astype(np.complex128).flatten()
         sol = solve_ivp(
             lambda t, y: (self.H(t) @ y) / (1j*h_bar), 
             [0, t_final], 
-            self.v_0.astype(np.complex128), 
+            v_0, 
             t_eval=np.arange(0, t_final, dt_storage),
             first_step=self.dt,
             # dense_output=True,

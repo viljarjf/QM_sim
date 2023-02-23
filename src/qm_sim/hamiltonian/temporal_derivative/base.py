@@ -4,7 +4,7 @@ import numpy as np
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..hamiltonian import Hamiltonian
+    from .. import Hamiltonian
 from ...nature_constants import h_bar
 
 _SCHEMES = {}
