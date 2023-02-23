@@ -187,7 +187,7 @@ class Hamiltonian:
 
     def temporal_evolution(self, t_final: float, dt: float = None, 
         psi_0: np.ndarray = None) -> tuple[np.ndarray, np.ndarray]:
-        return self._temporal_solver(self, psi_0, dt).iterate(t_final, dt)
+        return self._temporal_solver(self, psi_0).iterate(t_final, dt)
     temporal_evolution.__doc__ = TemporalDerivative.iterate.__doc__
     
     def _get_eigen(self, n: int, t: float, **kwargs) -> tuple[np.ndarray, np.ndarray]:

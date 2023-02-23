@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from tqdm import tqdm
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -46,6 +47,15 @@ class BaseTemporalDerivative(ABC):
         if v_0 is None:
             v_0 = self._get_initial_condition()
         self.v_0 = v_0
+
+    def tqdm(self, t: float) -> tqdm:
+        pbar = tqdm(desc=self.name + " solver", total=t, disable=not self.H.verbose)
+        pbar.bar_format = "{l_bar}{bar}| {n:#.02g}/{total:#.02g}"
+
+        # Add func to update with t, not dt
+        pbar.progress = lambda t: pbar.update(t - pbar.n)
+
+        return pbar
 
 
     def _get_initial_condition(self) -> np.ndarray:

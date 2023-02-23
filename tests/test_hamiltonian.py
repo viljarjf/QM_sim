@@ -90,54 +90,55 @@ def test_temporal():
     t_end = 10e-15
     dt = 1e-17
 
-    H1 = Hamiltonian(N, L, m, temporal_scheme="leapfrog")
-    H2 = Hamiltonian(N, L, m, temporal_scheme="scipy-DOP853")
-
-    H2._temporal_solver.v_0 = H1._temporal_solver.v_0.copy()
-
+    H = []
+    schemes = ["leapfrog", "crank-nicolson", "scipy-Runge-Kutta 3(2)", "scipy-DOP853"]
+    for scheme in schemes:
+        H.append(Hamiltonian(N, L, m, temporal_scheme=scheme))
 
     z = np.linspace(-L[0]/2, L[0]/2, N[0])
     Vt = lambda t: 6*z**2 + 3*z*np.abs(z)*np.sin(4e15*t)
-    H1.set_potential(Vt)
-    H2.set_potential(Vt)
+    for Hi in H:
+        Hi.set_potential(Vt)
 
-    t1, psi1 = H1.temporal_evolution(t_end, dt)
-    t2, psi2 = H2.temporal_evolution(t_end, dt)
-    assert np.allclose(t1, t2)
-
-    psi1 = abs(psi1)**2
-    psi1 = psi1.real
-    psi2 = abs(psi2)**2
-    psi2 = psi2.real
+    _, _psi_0 = H[0].eigen(2)
+    psi_0 = 2**0-5 * (_psi_0[0, :] + _psi_0[1, :])
+    t = []
+    psi = []
+    for Hi in H:
+        ti, psii = Hi.temporal_evolution(t_end, dt, psi_0)
+        t.append(ti)
+        psi.append((abs(psii)**2).real)
 
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
 
-    V = np.array([Vt(tn) for tn in t1])
+    V = np.array([Vt(tn) for tn in t[0]])
 
-    ln_psi1, = ax1.plot(z / 1e-9, psi1[0, :])
-    ln_psi2, = ax1.plot(z / 1e-9, psi2[0, :])
+    psi_plots = []
+    for psii in psi:
+        ln_psi, = ax1.plot(z / 1e-9, psii[0, :])
+        psi_plots.append(ln_psi)
     ln_V, = ax2.plot(z / 1e-9, V[0, :] / const.e_0)
 
     def init():
         ax1.set_title(f"$|\Psi|^2$")
         ax1.set_xlabel("z [nm]")
-        ax1.legend([H1._temporal_solver.name, H2._temporal_solver.name])
+        ax1.legend(schemes)
         ax2.set_title("Potential [eV]")
         ax2.set_xlabel("z [nm]")
-        ax1.set_ylim(0, np.max(psi1) * 1.1)
+        ax1.set_ylim(0, np.max(psi[0]) * 1.1)
         ax2.set_ylim(np.min(V / const.e_0), np.max(V / const.e_0))
         fig.tight_layout()
-        return ln_psi1, ln_psi2, ln_V,
+        return *psi_plots, ln_V,
 
     def frames():
-        for n in range(psi1.shape[0]):
-            yield psi1[n, :], psi2[n, :], V[n, :]
+        for n in range(psi[0].shape[0]):
+            yield *[psii[n, :] for psii in psi], V[n, :]
 
     def update(data):
-        ln_psi1.set_data(z / 1e-9, data[0])
-        ln_psi2.set_data(z / 1e-9, data[1])
-        ln_V.set_data(z / 1e-9, data[2] / const.e_0)
-        return ln_psi1, ln_psi2, ln_V,
+        for i, psi_plot in enumerate(psi_plots):
+            psi_plot.set_data(z / 1e-9, data[i])
+        ln_V.set_data(z / 1e-9, data[-1] / const.e_0)
+        return *psi_plots, ln_V,
     
     ani = FuncAnimation(fig, update, frames=frames, init_func=init, blit=False, interval=50)
     plt.show()
