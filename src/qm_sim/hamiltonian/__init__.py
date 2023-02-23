@@ -185,9 +185,33 @@ class Hamiltonian:
             )
         return En_t, Psi_t
 
-    def temporal_evolution(self, t_final: float, dt: float = None, 
+    def temporal_evolution(self, t0: float, t_final: float, dt_storage: float = None, 
         psi_0: np.ndarray = None) -> tuple[np.ndarray, np.ndarray]:
-        return self._temporal_solver(self, psi_0).iterate(t_final, dt)
+
+        # Default: superposition of 1st and 2nd eigenstate
+        if psi_0 is None:
+            _, psi = self.eigen(2)
+            psi_0 = 2**-0.5 * (psi[0] + psi[1])
+        
+        # Calculate a good dt from von Neumann analysis of the leapfrog scheme
+        # NOTE: this assumes the temporal part is at most 4x the static part,
+        #       and that the potential takes its maximum somwhere at t=t0
+        V_max = np.max(self.get_V(t0) * 4)
+        V_min = np.min(self.get_V(t0) * 4)
+
+        E_max = max(
+            abs(V_min),
+            abs(V_max + 4 * const.h_bar**2 / (4*self.m * sum(d**2 for d in self.delta))),
+            )
+        dt = 0.25 * const.h_bar / E_max
+
+        # solve
+        f = lambda t: 1/(1j*const.h_bar) * self.__call__(t)
+        solver = self._temporal_solver(f, self.shape)
+        t, psi = solver.iterate(psi_0.astype(np.complex128), t0, 
+            t_final, dt, dt_storage, self.verbose)
+
+        return t, psi
     temporal_evolution.__doc__ = TemporalSolver.iterate.__doc__
     
     def _get_eigen(self, n: int, t: float, **kwargs) -> tuple[np.ndarray, np.ndarray]:
@@ -215,7 +239,7 @@ class Hamiltonian:
         E, psi = self.eigen(n, t)
         plot.eigen(E, psi)
 
-    def plot_temporal(self, t_final: float, dt: float, psi_0: np.ndarray = None):
+    def plot_temporal(self, t_final: float, dt: float, psi_0: np.ndarray = None, t0: float = 0):
         """Plot the temporal evolution of the eigenstates
 
         Args:
@@ -223,7 +247,7 @@ class Hamiltonian:
             dt (float): Simulation time between each frame
             psi_0 (np.ndarray, optional): Initial state. Defaults to None.
         """
-        t, psi = self.temporal_evolution(t_final, dt, psi_0)
+        t, psi = self.temporal_evolution(t0, t_final, dt, psi_0)
         plot.temporal(t, psi, self.get_V)
 
     def plot_potential(self, t: float = 0):

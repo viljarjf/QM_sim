@@ -1,9 +1,9 @@
+from typing import Callable
+
 import numpy as np
 from scipy.linalg import solve_banded
 from scipy.sparse import dia_matrix
-from tqdm import tqdm
 
-from ...nature_constants import h_bar
 from .base import BaseTemporalSolver
 
 
@@ -21,24 +21,27 @@ class CrankNicolson(BaseTemporalSolver):
     stable = True
     name = "crank-nicolson"
 
-    def __init__(self, H: "Hamiltonian", v_0: np.ndarray = None, dt: float = None):
-        if H.ndim != 1:
+    def __init__(self, H: Callable[[float], np.ndarray], output_shape: tuple[int] = None):
+        super().__init__(H, output_shape)
+        if len(self.output_shape) != 1:
             raise ValueError("Crank-Nicolson solver only supports 1D systems")
-        super().__init__(H, v_0, dt)
 
-    def iterate(self, t_final: float, dt_storage: float = None):
+    def iterate(self, v_0: np.ndarray, t0: float, t_final: float, 
+        dt: float, dt_storage: float = None, verbose: bool = True) -> tuple[np.ndarray, np.ndarray]:
 
-        dt = self.dt
+        if dt_storage is None:
+            dt_storage = dt
+
         H = self.H
-        prefactor = dt/(2j * h_bar)
+        prefactor = dt/2
 
-        tn = 0
-        psi_n = self.v_0
+        tn = t0
+        psi_n = v_0
 
         t = [tn]
         psi = [psi_n]
 
-        with self.tqdm(t_final) as pbar:
+        with self.tqdm(t0, t_final, verbose) as pbar:
             while tn < t_final:
 
                 # psi^n+1 = psi^n + dt/2*(F^n+1 + F^n)
