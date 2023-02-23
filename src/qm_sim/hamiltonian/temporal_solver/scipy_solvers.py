@@ -3,9 +3,9 @@ from scipy.integrate import solve_ivp
 from tqdm import tqdm
 
 from ...nature_constants import h_bar
-from .base import BaseTemporalDerivative
+from .base import BaseTemporalSolver
 
-class ScipySolver(BaseTemporalDerivative):
+class ScipySolver(BaseTemporalSolver):
     method: str
 
     _skip_registration = True

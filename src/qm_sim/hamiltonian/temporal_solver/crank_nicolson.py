@@ -4,7 +4,7 @@ from scipy.sparse import dia_matrix
 from tqdm import tqdm
 
 from ...nature_constants import h_bar
-from .base import BaseTemporalDerivative
+from .base import BaseTemporalSolver
 
 
 def I_plus_aH(a: complex, H: dia_matrix) -> dia_matrix:
@@ -15,7 +15,7 @@ def I_plus_aH(a: complex, H: dia_matrix) -> dia_matrix:
     out.data[zero_ind] += 1
     return out
 
-class CrankNicolson(BaseTemporalDerivative):
+class CrankNicolson(BaseTemporalSolver):
     order = 2
     explicit = False
     stable = True
