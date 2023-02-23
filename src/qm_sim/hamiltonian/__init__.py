@@ -206,16 +206,33 @@ class Hamiltonian:
         return E, psi
     
     def plot_eigen(self, n: int, t: float = 0):
-        plot.plot_eigen(self, n, t)
-    plot_eigen.__doc__ = plot.plot_eigen.__doc__
+        """Calculate and plot n eigenstates at time t
+
+        Args:
+            n (int): Amount of eigenstates to find
+            t (float, optional): Time at which to find eigenstates. Defaults to 0.
+        """
+        E, psi = self.eigen(n, t)
+        plot.eigen(E, psi)
 
     def plot_temporal(self, t_final: float, dt: float, psi_0: np.ndarray = None):
-        plot.plot_temporal(self, t_final, dt, psi_0)
-    plot_temporal.__doc__ = plot.plot_temporal.__doc__
+        """Plot the temporal evolution of the eigenstates
+
+        Args:
+            t_final (float): Simulation end time
+            dt (float): Simulation time between each frame
+            psi_0 (np.ndarray, optional): Initial state. Defaults to None.
+        """
+        t, psi = self.temporal_evolution(t_final, dt, psi_0)
+        plot.temporal(t, psi, self.get_V)
 
     def plot_potential(self, t: float = 0):
-        plot.plot_potential(self, t)
-    plot_potential.__doc__ = plot.plot_potential.__doc__
+        """Plot the potential at time t
+
+        Args:
+            t (float, optional): Time. Defaults to 0.
+        """
+        plot.potential(self.get_V(t))
 
     def __add__(self, other: np.ndarray) -> dia_matrix:
         if self._default_data is None:
