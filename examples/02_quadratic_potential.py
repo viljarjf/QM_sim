@@ -22,7 +22,7 @@ x = np.linspace(-L[0]/2, L[0]/2, N[0])
 def V(t):
     k = 200
     return 1/2*(k+t)*x**2
-H.set_potential(V)
+H.V = V
 
 # Plot
 H.plot_potential()

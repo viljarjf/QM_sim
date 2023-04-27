@@ -32,7 +32,7 @@ def V(theta: float) -> np.ndarray:
     V = convolve2d(V, kernel, mode="same", boundary="wrap")
     return V
     
-H.set_potential(lambda t: V(1e14*t))
+H.V = lambda t: V(1e14*t)
 
 # Set initial condition to a
 # superposition of third and fourth eigenstate

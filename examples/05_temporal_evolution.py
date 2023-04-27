@@ -16,7 +16,7 @@ H = Hamiltonian(N, L, m, temporal_scheme="leapfrog")
 # Set the potential to a quadratic potential oscilating from side to side
 z = np.linspace(-L[0]/2, L[0]/2, N[0])
 Vt = lambda t: 6*z**2 + 3*z*np.abs(z)*np.sin(4e15*t)
-H.set_potential(Vt)
+H.V = Vt
 
 # Plot
 H.plot_temporal(t_end, dt)

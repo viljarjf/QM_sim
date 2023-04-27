@@ -29,10 +29,11 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
 
         Approximate the derivative of sin(x).
 
+        >>> from qm_sim.spatial_derivative.cartesian import nabla
         >>> import numpy as np
         >>> N = (1000,)
         >>> L = (2*np.pi,)
-        >>> n = finite_difference.nabla( N, L )
+        >>> n = nabla( N, L )
         >>> x = np.linspace( 0, L[0], N[0] )
         >>> y = np.sin(x)
         
@@ -50,7 +51,7 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
         case 4:
             stencil = [1/12, -2/3]
         case 6:
-            stencil = [1/60, 3/20, -3/4]
+            stencil = [-1/60, 3/20, -3/4]
         case 8:
             stencil = [1/280, -4/105, 1/5, -4/5]
         case _:
@@ -58,7 +59,7 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
     stencil += [0]
     indices = _mirror_sign_list([-i for i in range(len(stencil))][::-1])
     stencil = _mirror_sign_list(stencil)
-    return _matrix_from_stencil(stencil, indices, 1, N, L, dtype)
+    mat = _matrix_from_stencil(stencil, indices, 1, N, L, dtype)
 
 
 def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:
@@ -87,10 +88,11 @@ def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.f
 
         Approximate the second derivative of sin(x).
 
+        >>> from qm_sim.spatial_derivative.cartesian import laplacian
         >>> import numpy as np
         >>> N = (1000,)
         >>> L = (2*np.pi,)
-        >>> n = finite_difference.laplacian( N, L )
+        >>> n = laplacian( N, L )
         >>> x = np.linspace( 0, L[0], N[0] )
         >>> y = np.sin(x)
         

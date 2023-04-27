@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 import numpy as np
 from tqdm import tqdm
 
-from typing import Callable
-from ...nature_constants import h_bar
+from ..nature_constants import h_bar
 
 # Dict to store subclasses of BaseTemporalSolver
 _SCHEMES = {}

@@ -1,15 +1,17 @@
+from typing import Callable
+
 import numpy as np
 from scipy.sparse import dia_matrix
 from scipy.sparse.linalg import eigsh as scipy_eigsh
-from typing import Callable
 from tqdm import tqdm
 
-from qm_sim import nature_constants as const
-from .spatial_derivative.cartesian import laplacian
-from .spatial_derivative import get_scheme_order
-from .temporal_solver import get_temporal_solver, TemporalSolver
+from .. import nature_constants as const
+from .. import plot
+from ..spatial_derivative import get_scheme_order
+from ..spatial_derivative.cartesian import nabla, laplacian
+from ..temporal_solver import TemporalSolver, get_temporal_solver
 from .eigsh import eigsh
-from . import plot
+
 
 class Hamiltonian:
 
@@ -53,42 +55,60 @@ class Hamiltonian:
         self._dim = len(N)
         self.delta = [Li / Ni for Li, Ni in zip(L, N)]
 
-        # index of the 0-offset.
-        # Set in _get_fd_matrix
-        self._centerline_index = None
-
-        if isinstance(m, np.ndarray):
-            if m.shape != self.N:
-                raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
-            m = m.flatten()
-            self.m = max(m)
-        else:
-            self.m = m
-                
         order = get_scheme_order(spatial_scheme)
         if order is None:
             raise ValueError("Requested finite difference is invalid")
-        self.mat = laplacian(N, L, order)
+
+        # Handle non-isotropic effective mass
+        if isinstance(m, np.ndarray):
+            if m.shape != self.N:
+                raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
+            m_inv = 1 / m.flatten()
+
+            _n = nabla(N, L, order)
+            _n2 = laplacian(N, L, order)
+
+            # nabla m_inv nabla + m_inv nabla^2
+            _n.data *= _n @ m_inv   # First term
+            _n2.data *= m_inv       # Second term
+            self.mat = _n + _n2
+        else:
+            print("Const")
+            self.mat = laplacian(N, L, order)
+            self.mat *= 1/m
+        
         self._centerline_index = list(self.mat.offsets).index(0)
         self._default_data = None
 
         # Prefactor in hamiltonian.
         # Is either float or array, depending on `m`
-        h0 = -const.h_bar**2 / (2 * m)
+        h0 = -const.h_bar**2 / 2
         
         # Multiplying the diagonal data directly is easier
         # if we have non-constant mass
         self.mat.data *= h0
 
         # static zero potential by default
-        self.V = np.zeros(shape = N)
-        self.__V_timedep = False
+        self._V = lambda t: np.zeros(shape = N)
 
         self.verbose = verbose
 
         self._temporal_solver = get_temporal_solver(temporal_scheme)
+    
+    @property
+    def V(self) -> Callable[[float], np.ndarray]:
+        """Potential as a function of time. 
+        Output has same shape as system.
 
-    def set_potential(self, V: np.ndarray | Callable[[float], np.ndarray]):
+        Returns:
+            Callable[[float], np.ndarray]: 
+                input: time
+                output: potential
+        """
+        return self._V
+
+    @V.setter
+    def V(self, V: np.ndarray | Callable[[float], np.ndarray]):
         """Set a (potentially time dependent) potential for the QM-system's Hamiltonian
         
         Args: 
@@ -97,20 +117,15 @@ class Hamiltonian:
                 if callable, the call variable will represent a changable parameter (usually time) with a 
                 return type identical to the static case where V is an np.ndarray
         """
-        # Todo: Set up tests to check if V is valid
-        if callable(V):
-            self.__V_timedep = True
-        else:
-            self.__V_timedep = False
-        # New potential -> new solutions. Clear stored solutions
-        self._stored_solutions = {}
+        if not callable(V):
+            # Avoid the lambda func referring to itself
+            array_V = V
+            V = lambda t: array_V
+        
+        if V(0).shape != self.shape:
+            raise ValueError(f"Inconsistent shape. Shape must be {self.shape}")
 
-        self.V = V
-
-    def get_V(self, t: float = 0) -> np.ndarray:
-        if self.__V_timedep:
-            return self.V(t)
-        return self.V
+        self._V = V
 
     def eigen(self, n: int, t: float = 0) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the n smallest eigenenergies and the corresponding eigenstates of the hamiltonian
@@ -164,8 +179,6 @@ class Hamiltonian:
             tuple[np.ndarray(shape = steps), np.ndarray(shape = (N, steps))]:
                 (E(t), Psi(t)), Time evolution of the eigenstate.
         """
-        if not self.__V_timedep:
-            raise RuntimeError("Hamiltonian needs to be time-dependent for method to be meaingful.")
         
         Psi_t = np.empty(shape = (*self.N,steps+1))
         En_t = np.empty(steps+1)
@@ -196,12 +209,12 @@ class Hamiltonian:
         # Calculate a good dt from von Neumann analysis of the leapfrog scheme
         # NOTE: this assumes the temporal part is at most 4x the static part,
         #       and that the potential takes its maximum somwhere at t=t0
-        V_max = np.max(self.get_V(t0) * 4)
-        V_min = np.min(self.get_V(t0) * 4)
+        V_max = np.max(self.V(t0) * 4)
+        V_min = np.min(self.V(t0) * 4)
 
         E_max = max(
             abs(V_min),
-            abs(V_max + 4 * const.h_bar**2 / (4*self.m * sum(d**2 for d in self.delta))),
+            abs(V_max + 4 * np.max(self.mat.data)),
             )
         dt = 0.25 * const.h_bar / E_max
 
@@ -248,7 +261,7 @@ class Hamiltonian:
             psi_0 (np.ndarray, optional): Initial state. Defaults to None.
         """
         t, psi = self.temporal_evolution(t0, t_final, dt, psi_0)
-        plot.temporal(t, psi, self.get_V)
+        plot.temporal(t, psi, self.V)
 
     def plot_potential(self, t: float = 0):
         """Plot the potential at time t
@@ -256,7 +269,7 @@ class Hamiltonian:
         Args:
             t (float, optional): Time. Defaults to 0.
         """
-        plot.potential(self.get_V(t))
+        plot.potential(self.V(t))
 
     def __add__(self, other: np.ndarray) -> dia_matrix:
         if self._default_data is None:
@@ -267,7 +280,7 @@ class Hamiltonian:
         return self.mat
     
     def __call__(self, t: float) -> dia_matrix:
-        return self + self.get_V(t)
+        return self + self.V(t)
     
     @property
     def shape(self):

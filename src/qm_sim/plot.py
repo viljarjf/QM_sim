@@ -1,10 +1,11 @@
 from typing import Callable
 
+import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import ArtistAnimation
-import numpy as np
 
-from ..nature_constants import e_0
+from .nature_constants import e_0
+
 
 def _get_plot_fun(ndim: int, ax: plt.Axes = None):
     if ax is None:

@@ -35,7 +35,7 @@ def test_eigensolvers():
         V[i] = 0.0
     
     H = s.Hamiltonian(N, L, stencil, 1.0)
-    H.set_potential(V)
+    H.V = V
 
     H2 = TestHam(N, L, stencil, 1.0)
     H2.set_potential(V)
@@ -43,7 +43,7 @@ def test_eigensolvers():
 
     # NOTE: the Hamiltonian class does NOT use reduced units (yet)
     H3 = Hamiltonian(N, [1e-9*i for i in L], m_e)
-    H3.set_potential(np.array(V) * e_0)
+    H3.V = np.array(V) * e_0
 
     @timer(n_iter)
     def spectra():

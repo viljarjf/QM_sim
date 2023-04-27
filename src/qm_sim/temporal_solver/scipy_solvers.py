@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-from tqdm import tqdm
 
 from .base import BaseTemporalSolver
+
 
 class ScipySolver(BaseTemporalSolver):
     method: str
