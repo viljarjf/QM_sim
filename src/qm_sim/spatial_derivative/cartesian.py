@@ -59,7 +59,7 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
     stencil += [0]
     indices = _mirror_sign_list([-i for i in range(len(stencil))][::-1])
     stencil = _mirror_sign_list(stencil)
-    mat = _matrix_from_stencil(stencil, indices, 1, N, L, dtype)
+    return _matrix_from_stencil(stencil, indices, 1, N, L, dtype)
 
 
 def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:

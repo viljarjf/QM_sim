@@ -130,7 +130,7 @@ def test_temporal():
     H: list[Hamiltonian] = []
     schemes = ["leapfrog", "crank-nicolson", "scipy-Runge-Kutta 3(2)", "scipy-DOP853"]
     for scheme in schemes:
-        H.append(Hamiltonian(N, L, m, temporal_scheme=scheme), verbose=False)
+        H.append(Hamiltonian(N, L, m, temporal_scheme=scheme, verbose=False))
 
     z = np.linspace(-L[0]/2, L[0]/2, N[0])
     Vt = lambda t: 6*z**2 + 3*z*np.abs(z)*np.sin(4e15*t)

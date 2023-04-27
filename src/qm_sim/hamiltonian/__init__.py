@@ -60,7 +60,10 @@ class Hamiltonian:
             raise ValueError("Requested finite difference is invalid")
 
         # Handle non-isotropic effective mass
+        if isinstance(m, np.ndarray) and np.all(m == m.flatten()[0]):
+            m = m.flatten()[0]
         if isinstance(m, np.ndarray):
+            print("Warning: Continuity is NOT satisfied (yet) with non-isotropic mass")
             if m.shape != self.N:
                 raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
             m_inv = 1 / m.flatten()
@@ -73,7 +76,6 @@ class Hamiltonian:
             _n2.data *= m_inv       # Second term
             self.mat = _n + _n2
         else:
-            print("Const")
             self.mat = laplacian(N, L, order)
             self.mat *= 1/m
         
