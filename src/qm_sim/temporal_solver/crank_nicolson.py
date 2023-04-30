@@ -22,7 +22,7 @@ class CrankNicolson(TemporalSolver):
     name = "crank-nicolson"
 
     def __init__(self, H: Callable[[float], np.ndarray], output_shape: tuple[int] = None):
-        TemporalSolver.__init__(H, output_shape)
+        TemporalSolver.__init__(self, H, output_shape)
         if len(self.output_shape) != 1:
             raise ValueError("Crank-Nicolson solver only supports 1D systems")
 
