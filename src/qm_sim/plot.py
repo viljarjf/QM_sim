@@ -14,7 +14,7 @@ def _get_plot_fun(ndim: int, ax: plt.Axes = None):
     if ndim == 1:
         return lambda *args, **kwargs: ax.plot(*args, c="b", **kwargs)
     elif ndim == 2:
-        # To preserve the return type of `plot` above
+        # To preserve the return type of :code:`plot`above
         return lambda *args, **kwargs: [ax.imshow(*args, **kwargs)]
     elif ndim == 3:
         raise NotImplementedError("3D plots not yet supported")
@@ -46,9 +46,10 @@ def _shape_from_int(n: int) -> tuple[int, int]:
 def eigen(E: np.ndarray, psi: np.ndarray):
     """Plot absolute square of wave function
 
-    Args:
-        E (np.ndarray): Eigenenergies
-        psi (np.ndarray): Eigenstates
+    :param E: Eigenenergies
+    :type E: np.ndarray
+    :param psi: Eigenfunctions
+    :type psi: np.ndarray
     """
     n = E.shape[0]
     ndim = len(psi.shape) - 1
@@ -63,15 +64,17 @@ def eigen(E: np.ndarray, psi: np.ndarray):
         plot(abs(psi[i])**2)
     plt.tight_layout()
     plt.show()
-
+    return
 
 def temporal(t: np.ndarray, psi: np.ndarray, Vt: Callable[[float], np.ndarray]):
     """Create an animation of the wave function, alongside the potential
 
-    Args:
-        t (np.ndarray): times corresponding to the wave functions
-        psi (np.ndarray): wave functions 
-        Vt (Callable[[float], np.ndarray]): Function that returns potential at the input time
+    :param t: Times correspondind to the wave functions
+    :type t: np.ndarray
+    :param psi: Wave funcions
+    :type psi: np.ndarray
+    :param Vt: Function of time, returning the potential at that time
+    :type Vt: Callable[[float], np.ndarray]
     """
     ndim = len(psi.shape) - 1
 
@@ -109,15 +112,17 @@ def temporal(t: np.ndarray, psi: np.ndarray, Vt: Callable[[float], np.ndarray]):
 
     ani = ArtistAnimation(fig, ims, blit=True, interval=50)
     plt.show()
+    return
 
 
 def potential(V: np.ndarray):
-    """Plot the potential at a given time
+    """Plot the potential
 
-    Args:
-        V (np.ndarray): Potential array
+    :param V: Potential array
+    :type V: np.ndarray
     """
     plt.figure()
     _get_plot_fun(len(V.shape))(V / e_0)
     plt.title("Potential [eV]")
     plt.show()
+    return
