@@ -2,7 +2,6 @@ from typing import Callable
 
 import numpy as np
 from scipy.sparse import dia_matrix
-from scipy.sparse.linalg import eigsh as scipy_eigsh
 from tqdm import tqdm
 
 from .. import nature_constants as const
@@ -10,7 +9,7 @@ from .. import plot
 from ..spatial_derivative import get_scheme_order
 from ..spatial_derivative.cartesian import nabla, laplacian
 from ..temporal_solver import TemporalSolver, get_temporal_solver
-from .eigsh import eigsh
+from .scipy_eigsh import get_eigen as scipy_get_eigen
 
 
 class Hamiltonian:
@@ -60,7 +59,7 @@ class Hamiltonian:
             raise ValueError("Requested finite difference is invalid")
 
         # Handle non-isotropic effective mass
-        if isinstance(m, np.ndarray) and np.all(m == m.flatten()[0]):
+        if isinstance(m, np.ndarray) and np.all(m == m.flat[0]):
             m = m.flatten()[0]
         if isinstance(m, np.ndarray):
             print("Warning: Continuity is NOT satisfied (yet) with non-isotropic mass")
@@ -144,7 +143,7 @@ class Hamiltonian:
             np.ndarray:
                 Normalised eigenstates, shape (n, *N) for a system with shape N
         """
-        E, psi = self._get_eigen(n, t)
+        E, psi = scipy_get_eigen(self(t), n, self.N)
 
         # calculate normalisation factor
         nf = [psi[i, :]**2 for i in range(n)]
@@ -228,21 +227,6 @@ class Hamiltonian:
 
         return t, psi
     temporal_evolution.__doc__ = TemporalSolver.iterate.__doc__
-    
-    def _get_eigen(self, n: int, t: float, **kwargs) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Calculate eigenvalues and eigenstates at time `t`.
-        """
-        if kwargs.get("sigma") is None:
-            E, psi = eigsh(self._fast_matmul_op(t), self.N_total, 
-                self.mat.dtype, which="SA", k=n, **kwargs)
-        else:
-            E, psi = scipy_eigsh(self(t), k=n, **kwargs)
-
-        # Reshape into system shape.
-        # Arrays returned from eigsh are fortran ordered
-        psi = np.array([psi[:, i].reshape(self.N, order="F") for i in range(n)])
-        return E, psi
     
     def plot_eigen(self, n: int, t: float = 0):
         """Calculate and plot n eigenstates at time t
