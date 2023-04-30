@@ -14,56 +14,58 @@ from .eigensolvers import get_eigensolver
 
 class Hamiltonian:
     """Discrete hamiltonian of a system
-
-    :param N: Discretization count along each axis
-    :type N: tuple
-    :param L: System size along each axis
-    :type L: tuple
-    :param m: Mass of the particle in the system. 
-        Can be constant (float) or vary in the simulation area (array).
-        If an array is used, :code:`m.shape == N` must hold
-    :type m: float | np.ndarray
-    :param spatial_scheme: Finite difference scheme for spatial derivative. 
-        Options are: 
-        
-        - three-point
-        - five-point
-        - seven-point
-        - nine-point
-
-        Defaults to "three-point"
-    :type spatial_scheme: str, optional
-    :param temporal_scheme: Finite difference scheme for temporal derivative.
-        Options are:
-
-        - crank-nicolson
-        - leapfrog
-        - scipy-Runge-Kutta 5(4)
-        - scipy-Runge-Kutta 3(2)
-        - scipy-DOP853
-        - scipy-backwards-differentiation
-
-        Defaults to "leapfrog"
-    :type temporal_scheme: str, optional
-    :param eigensolver: Choose which eigensolver backend to use.
-        Options are:
-
-        - scipy
-        - torch (optional dependency, must be installed)
-
-        Defaults to "scipy"
-    :type eigensolver: str, optional
-    :param verbose: Option to display calculation and iteration info during runtime.
-        Defaults to True
-    :type verbose: bool, optional
     """
 
     def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, 
         spatial_scheme: str = "three-point", temporal_scheme: str = "leapfrog",
         eigensolver: str = "scipy", verbose: bool = True):
+        """Constructor
+
+        :param N: Discretization count along each axis
+        :type N: tuple
+        :param L: System size along each axis
+        :type L: tuple
+        :param m: Mass of the particle in the system. 
+            Can be constant (float) or vary in the simulation area (array).
+            If an array is used, :code:`m.shape == N` must hold
+        :type m: float | np.ndarray
+        :param spatial_scheme: Finite difference scheme for spatial derivative. 
+            Options are: 
+            
+            - three-point
+            - five-point
+            - seven-point
+            - nine-point
+
+            Defaults to "three-point"
+        :type spatial_scheme: str, optional
+        :param temporal_scheme: Finite difference scheme for temporal derivative.
+            Options are:
+
+            - crank-nicolson
+            - leapfrog
+            - scipy-Runge-Kutta 5(4)
+            - scipy-Runge-Kutta 3(2)
+            - scipy-DOP853
+            - scipy-backwards-differentiation
+
+            Defaults to "leapfrog"
+        :type temporal_scheme: str, optional
+        :param eigensolver: Choose which eigensolver backend to use.
+            Options are:
+
+            - scipy
+            - torch (optional dependency, must be installed)
+
+            Defaults to "scipy"
+        :type eigensolver: str, optional
+        :param verbose: Option to display calculation and iteration info during runtime.
+            Defaults to True
+        :type verbose: bool, optional
+        """
        
         if len(N) != len(L):
-            raise ValueError(":code:N`and :code:`L`must have same length")
+            raise ValueError("`N`and `L`must have same length")
         
         self.N = N
         self.L = L
@@ -84,7 +86,7 @@ class Hamiltonian:
         if isinstance(m, np.ndarray):
             print("Warning: Continuity is NOT satisfied (yet) with non-isotropic mass")
             if m.shape != self.N:
-                raise ValueError(f"Inconsistent shape of :code:`m:code:: {m.shape}, should be {self.N}")
+                raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
             m_inv = 1 / m.flatten()
 
             _n = nabla(N, L, order)
@@ -102,7 +104,7 @@ class Hamiltonian:
         self._default_data = None
 
         # Prefactor in hamiltonian.
-        # Is either float or array, depending on :code:`m:code:
+        # Is either float or array, depending on `m`
         h0 = -const.h_bar**2 / 2
         
         # Multiplying the diagonal data directly is easier
@@ -247,7 +249,7 @@ class Hamiltonian:
 
 
     def plot_eigen(self, n: int, t: float = 0):
-        """Calculate and plot :code:`n`eigenstates at time :code:`t:code:
+        """Calculate and plot :code:`n` eigenstates at time :code:`t`
 
         :param n: Amount of eigenstates to plot
         :type n: int
