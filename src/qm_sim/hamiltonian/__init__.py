@@ -16,6 +16,7 @@ from ..spatial_derivative import get_scheme_order
 from ..spatial_derivative.cartesian import nabla, laplacian
 from ..temporal_solver import TemporalSolver, get_temporal_solver
 from .eigensolvers import get_eigensolver
+from scipy.sparse.linalg import eigsh as adiabatic_eigsh
 
 
 class Hamiltonian:
@@ -152,7 +153,7 @@ class Hamiltonian:
 
         self._V = V
 
-    def eigen(self, n: int, t: float = 0) -> tuple[np.ndarray, np.ndarray]:
+    def eigen(self, n: int, t: float = 0, **kwargs) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the n smallest eigenenergies and the corresponding eigenstates of the hamiltonian
 
         :param n: Amount of eigenenergies/states to output
@@ -168,8 +169,13 @@ class Hamiltonian:
         :rtype: tuple[np.ndarray(shape = (n)), np.ndarray(shape = (n, N))]
         """
 
-        
-        E, psi = self.eigensolver(self(t), n, self.N)
+        # The adiabatic solver uses some features of the eigensolver
+        # not exposed by the `self.eigensolver` function
+        if kwargs.pop("is_adiabatic", False):
+            E, psi = adiabatic_eigsh(self(t), k=n, **kwargs)
+            psi = np.array([psi[:, i].reshape(self.N, order="F") for i in range(n)])
+        else:
+            E, psi = self.eigensolver(self(t), n, self.N)
 
         # calculate normalisation factor
         nf = [psi[i, :]**2 for i in range(n)]
@@ -210,16 +216,17 @@ class Hamiltonian:
         t = t0
 
         # initialize
-        _, Psi_t[:, :, 0] = self._get_eigen(1, t, sigma=E_n)
+        _, Psi_t[:, :, 0] = self.eigen(1, t, sigma=E_n, is_adiabatic=True)
         En_t[0] = E_n
 
         for i in tqdm(range(1, steps+1), desc="Adiabatic evolution", disable=not self.verbose):
             t += dt
-            En_t[i], Psi_t[:,:,i] = self._get_eigen( 1, t,
+            En_t[i], Psi_t[:,:,i] = self.eigen( 1, t,
                 # smartly condition eigsolver to "hug" the single eigenvalue solution; eigenvector and eigenvalue should be
                 # far closer to the previous one than any other if the adiabatic theorem is fulfilled
                 sigma=En_t[i-1],
-                v0=-Psi_t[:,:,i-1]
+                v0=-Psi_t[:,:,i-1],
+                is_adiabatic=True
             )
         return En_t, Psi_t
 
