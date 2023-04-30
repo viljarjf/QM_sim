@@ -21,15 +21,15 @@ def get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs):
         np.ndarray: eigenvectors, shape (n, *`shape`)
     """
     if kwargs.get("sigma") is None:
-        l, v = eigsh(mat._mul_vector, mat.shape[0], 
+        v, w = eigsh(mat._mul_vector, mat.shape[0], 
             mat.dtype, k=n, **kwargs)
     else:
-        l, v = eigsh(mat, k=n, **kwargs)
+        v, w = eigsh(mat, k=n, **kwargs)
 
     # Reshape into system shape.
     # Arrays returned from eigsh are fortran ordered
-    v = np.array([v[:, i].reshape(shape, order="F") for i in range(n)])
-    return l, v
+    w = np.array([w[:, i].reshape(shape, order="F") for i in range(n)])
+    return v, w
 
 
 def eigsh(A_OP, n, dtype, k=6, sigma=None, which='SA', v0=None,

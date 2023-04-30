@@ -10,13 +10,14 @@ from ..spatial_derivative import get_scheme_order
 from ..spatial_derivative.cartesian import nabla, laplacian
 from ..temporal_solver import TemporalSolver, get_temporal_solver
 from .scipy_eigsh import get_eigen as scipy_get_eigen
+from .pytorch_eigsh import get_eigen as pytorch_get_eigen
 
 
 class Hamiltonian:
 
     def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, 
         spatial_scheme: str = "three-point", temporal_scheme: str = "leapfrog",
-        verbose: bool = True):
+        verbose: bool = True, eigensolver: str = "scipy"):
         """Discrete hamiltonian of a system
 
         Args:
@@ -53,6 +54,13 @@ class Hamiltonian:
         self.L = L
         self._dim = len(N)
         self.delta = [Li / Ni for Li, Ni in zip(L, N)]
+        
+        if eigensolver == "pytorch" or eigensolver == "torch":
+            self.eigensolver = pytorch_get_eigen
+        elif eigensolver == "scipy":
+            self.eigensolver = scipy_get_eigen
+        else:
+            raise ValueError(f"Eigensolver {eigensolver} not found")
 
         order = get_scheme_order(spatial_scheme)
         if order is None:
@@ -143,7 +151,7 @@ class Hamiltonian:
             np.ndarray:
                 Normalised eigenstates, shape (n, *N) for a system with shape N
         """
-        E, psi = scipy_get_eigen(self(t), n, self.N)
+        E, psi = self.eigensolver(self(t), n, self.N)
 
         # calculate normalisation factor
         nf = [psi[i, :]**2 for i in range(n)]
