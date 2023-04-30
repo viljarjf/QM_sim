@@ -4,44 +4,43 @@ from scipy import sparse as sp
 
 
 def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:
-    """
-    Finite difference derivative in cartesian coordinates.
+    """Finite difference derivative in cartesian coordinates.
     Uses central stencil.
 
-    Args:
-        N (tuple): 
-            Discretization count along each axis
-        L (tuple): 
-            System size along each axis
-        order (int, optional): 
-            Numerical order of the differentiation scheme.
-            Options are:
-                - 2
-                - 4
-                - 6
-                - 8
-            Defaults to 2.
-        dtype (type, optional):
-            datatype of matrix. 
-            Defaults to float64
-
     Example:
+    
+    # Approximate the derivative of sin(x).
+    >>> from qm_sim.spatial_derivative.cartesian import nabla
+    >>> import numpy as np
+    >>> N = (1000,)
+    >>> L = (2*np.pi,)
+    >>> n = nabla( N, L )
+    >>> x = np.linspace( 0, L[0], N[0] )
+    >>> y = np.sin(x)
+    # Now, the following estimates the second derivative of sin(x)
+    >>> n @ y
 
-        Approximate the derivative of sin(x).
+    :param N: Discretization count along each axis
+    :type N: tuple[int]
+    :param L: System size along each axis
+    :type L: tuple[float]
+    :param order: Numerical order of the differentiation scheme.
+        Options are:
 
-        >>> from qm_sim.spatial_derivative.cartesian import nabla
-        >>> import numpy as np
-        >>> N = (1000,)
-        >>> L = (2*np.pi,)
-        >>> n = nabla( N, L )
-        >>> x = np.linspace( 0, L[0], N[0] )
-        >>> y = np.sin(x)
-        
-        Now, the following estimates the second derivative of sin(x)
-        >>> n @ y
+            - 2
+            - 4
+            - 6
+            - 8
 
+        Defaults to 2.
+    :type order: int, optional
+    :param dtype: datatype of matrix. 
+        Defaults to np.float64
+    :type dtype: type, optional
+    :raises NotImplementedError: if requested order is not available
+    :return: Discretized derivative matrix
+    :rtype: sp.dia_matrix
     """
-
     # Lookup for first half of stencil. 
     # A 0 is appended for the central element, 
     # and the rest is mirrored with a sign change later
@@ -63,42 +62,42 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
 
 
 def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:
-    """
-    Finite difference double derivative in cartesian coordinates.
+    """Finite difference double derivative in cartesian coordinates.
     Uses central stencil
 
-    Args:
-        N (tuple): 
-            Discretization count along each axis
-        L (tuple): 
-            System size along each axis
-        order (int, optional): 
-            Numerical order of the differentiation scheme.
-            Options are:
-                - 2
-                - 4
-                - 6
-                - 8
-            Defaults to 2.
-        dtype (type, optional):
-            datatype of matrix. 
-            Defaults to float64
-
     Example:
+    
+    # Approximate the second derivative of sin(x).
+    >>> from qm_sim.spatial_derivative.cartesian import laplacian
+    >>> import numpy as np
+    >>> N = (1000,)
+    >>> L = (2*np.pi,)
+    >>> n = laplacian( N, L )
+    >>> x = np.linspace( 0, L[0], N[0] )
+    >>> y = np.sin(x)
+    # Now, the following estimates the second derivative of sin(x)
+    >>> n @ y
 
-        Approximate the second derivative of sin(x).
+    :param N: Discretization count along each axis
+    :type N: tuple[int]
+    :param L: System size along each axis
+    :type L: tuple[float]
+    :param order: Numerical order of the differentiation scheme.
+        Options are:
 
-        >>> from qm_sim.spatial_derivative.cartesian import laplacian
-        >>> import numpy as np
-        >>> N = (1000,)
-        >>> L = (2*np.pi,)
-        >>> n = laplacian( N, L )
-        >>> x = np.linspace( 0, L[0], N[0] )
-        >>> y = np.sin(x)
-        
-        Now, the following estimates the second derivative of sin(x)
-        >>> n @ y
-        
+            - 2
+            - 4
+            - 6
+            - 8
+
+        Defaults to 2.
+    :type order: int, optional
+    :param dtype: datatype of matrix. 
+        Defaults to np.float64
+    :type dtype: type, optional
+    :raises NotImplementedError: if requested order is not available
+    :return: Discretized derivative matrix
+    :rtype: sp.dia_matrix
     """
     # lookup the first half of the stencil, to be mirrored later
     match order:
