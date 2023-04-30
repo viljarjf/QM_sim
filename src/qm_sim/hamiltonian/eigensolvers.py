@@ -5,14 +5,14 @@ from scipy import sparse as sp
 # Dict to lookup the solvers
 __SOLVERS = {}
 
-import scipy_eigen
-__SOLVERS["scipy"] = scipy_eigen.get_eigen
+from .scipy_eigen import scipy_get_eigen
+__SOLVERS["scipy"] = scipy_get_eigen
 
 # Import guard the pytorch backend since it is optional
 try:
-    import pytorch_eigen
-    __SOLVERS["pytorch"] = pytorch_eigen.get_eigen
-    __SOLVERS["torch"] = pytorch_eigen.get_eigen
+    from .pytorch_eigen import torch_get_eigen
+    __SOLVERS["pytorch"] = torch_get_eigen
+    __SOLVERS["torch"] = torch_get_eigen
 except ImportError:
     # Maybe display a warning?
     pass
