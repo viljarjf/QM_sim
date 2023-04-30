@@ -42,7 +42,7 @@ class Leapfrog(TemporalSolver):
                 pbar.update(dt)
                 tn += dt
 
-                # store data every `dt_storage` seconds
+                # store data every :code:`dt_storage`seconds
                 if tn // dt_storage > len(psi):
                     psi.append(psi_0.reshape(self.output_shape))
                     t.append(tn)

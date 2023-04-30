@@ -8,7 +8,7 @@ from .base import TemporalSolver
 
 
 def I_plus_aH(a: complex, H: dia_matrix) -> dia_matrix:
-    """Return I + aH, where `I` is the unit matrix and a is `a` constant"""
+    """Return I + aH, where :code:`I`is the unit matrix and :code:`a` is constant"""
     out = H.copy().astype(np.complex128)
     out.data *= a
     zero_ind = list(out.offsets).index(0)
@@ -22,7 +22,7 @@ class CrankNicolson(TemporalSolver):
     name = "crank-nicolson"
 
     def __init__(self, H: Callable[[float], np.ndarray], output_shape: tuple[int] = None):
-        super().__init__(H, output_shape)
+        TemporalSolver.__init__(H, output_shape)
         if len(self.output_shape) != 1:
             raise ValueError("Crank-Nicolson solver only supports 1D systems")
 
@@ -62,7 +62,7 @@ class CrankNicolson(TemporalSolver):
                 pbar.update(dt)
                 tn += dt
 
-                # store data every `dt_storage` seconds
+                # store data every :code:`dt_storage`seconds
                 if tn // dt_storage > len(psi):
                     psi.append(psi_n)
                     t.append(tn)

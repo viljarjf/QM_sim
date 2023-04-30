@@ -5,6 +5,9 @@ from .base import TemporalSolver
 
 
 class ScipySolver(TemporalSolver):
+    """Base class for scipy's :code:`solve_ivp`-based solvers"""
+
+    #: Name of the :code:`solve_ivp` method
     method: str
 
     _skip_registration = True

@@ -11,22 +11,31 @@ _SCHEMES = {}
 
 
 class TemporalSolver(ABC):
+    """Class to solve :math:`y' = H(y)`"""
 
+    #: Name of the solver
     name: str
+
+    #: Integration order
     order: int
+
+    #: Is the method explicit or implicit?
     explicit: bool
+
+    #: Is the method stable? 
+    #: If only conditionally stable, this will be true 
+    #: and :code:`dt` will be forced into its stable range
     stable: bool
 
     _skip_registration: bool = False
 
     def __init__(self, H: Callable[[float], np.ndarray], output_shape: tuple[int] = None):
-        """
-        Initialise a temporal solver
+        """Initialize a temporal solver
 
-        Args:
-            H (Callable[[float], np.ndarray]): 
-                Function of time, returning a linear operator 
-                representing the state function at that time.
+        :param H: Function of time, representing the temporal derivative at that time
+        :type H: Callable[[float], np.ndarray]
+        :param output_shape: Expected shape of the solution, defaults to None
+        :type output_shape: tuple[int], optional
         """
 
         self.H = H
@@ -50,25 +59,28 @@ class TemporalSolver(ABC):
         dt: float, dt_storage: float = None, verbose: bool = True) -> tuple[np.ndarray, np.ndarray]:
         """
         Iterate the time propagation scheme.
-        Store the current state every `dt_storage`
+        Store the current state every :code:`dt_storage`
 
         Args:
             t_final (float): 
                 End time for calculations
             dt_storage (float, optional): 
                 Data storage period. 
-                If None, store each calculation `dt`
+                If None, store each calculation :code:`dt`
                 Defaults to None.
 
         Returns:
             np.ndarray:
-                Time values, shape (n,) for n storage times
+                Time values, shape (:code:`n`,) for :code:`n` storage times
             np.ndarray:
-                State at times stored in the other output. shape (n, H.shape)
+                State at times stored in the other output. shape (:code:`n`, :code:`H`.shape)
         """
         pass
 
     def __init_subclass__(cls):
+        """Register subclasses of :class:`TemporalSolver`
+
+        """
         if cls._skip_registration:
             return
         # Register new subclasses of TemporalSolver
@@ -79,6 +91,14 @@ class TemporalSolver(ABC):
 
 
 def get_temporal_solver(scheme: str) -> type[TemporalSolver]:
+    """Get a solver from its name, if it exists
+
+    :param scheme: Name of the solver
+    :type scheme: str
+    :raises ValueError: If the scheme does not exist
+    :return: A temporal solver class, NOT an instance
+    :rtype: type[TemporalSolver]
+    """
     if scheme in _SCHEMES.keys():
         return _SCHEMES[scheme]
     raise ValueError(f"Scheme {scheme} not found. Options are:\n" 
