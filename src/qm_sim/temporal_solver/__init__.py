@@ -1,5 +1,5 @@
 from .base import get_temporal_solver
-from .base import BaseTemporalSolver as TemporalSolver
+from .base import TemporalSolver
 
 # Tell python where to find subclasses
 from .crank_nicolson import CrankNicolson

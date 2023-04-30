@@ -1,9 +1,9 @@
 import numpy as np
 
-from .base import BaseTemporalSolver
+from .base import TemporalSolver
 
 
-class Leapfrog(BaseTemporalSolver):
+class Leapfrog(TemporalSolver):
     order = 2
     explicit = True
     stable = True # conditionally stable, dt is chosen accordingly
