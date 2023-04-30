@@ -22,7 +22,7 @@ V[
     N[0] // 2 - N[0] // 5 : N[0] // 2 + N[0] // 5, 
     N[1] // 2 - N[1] // 5 : N[1] // 2 + N[1] // 5
 ] = 0
-H.set_potential(V)
+H.V = V
 
 # Plot potential
 H.plot_potential()

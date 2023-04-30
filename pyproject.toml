@@ -28,6 +28,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "matplotlib"]
+torch = ["torch"]
 
 [build-system]
 requires = [

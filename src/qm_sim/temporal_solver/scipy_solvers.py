@@ -1,10 +1,10 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-from tqdm import tqdm
 
-from .base import BaseTemporalSolver
+from .base import TemporalSolver
 
-class ScipySolver(BaseTemporalSolver):
+
+class ScipySolver(TemporalSolver):
     method: str
 
     _skip_registration = True

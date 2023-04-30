@@ -4,7 +4,7 @@ import numpy as np
 from scipy.linalg import solve_banded
 from scipy.sparse import dia_matrix
 
-from .base import BaseTemporalSolver
+from .base import TemporalSolver
 
 
 def I_plus_aH(a: complex, H: dia_matrix) -> dia_matrix:
@@ -15,7 +15,7 @@ def I_plus_aH(a: complex, H: dia_matrix) -> dia_matrix:
     out.data[zero_ind] += 1
     return out
 
-class CrankNicolson(BaseTemporalSolver):
+class CrankNicolson(TemporalSolver):
     order = 2
     explicit = False
     stable = True

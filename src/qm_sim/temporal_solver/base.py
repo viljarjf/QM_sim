@@ -1,16 +1,16 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 import numpy as np
 from tqdm import tqdm
 
-from typing import Callable
-from ...nature_constants import h_bar
+from ..nature_constants import h_bar
 
-# Dict to store subclasses of BaseTemporalSolver
+# Dict to store subclasses of TemporalSolver
 _SCHEMES = {}
 
 
-class BaseTemporalSolver(ABC):
+class TemporalSolver(ABC):
 
     name: str
     order: int
@@ -78,7 +78,7 @@ class BaseTemporalSolver(ABC):
             raise ValueError("Cannot have two schemes with the same name")
 
 
-def get_temporal_solver(scheme: str) -> type[BaseTemporalSolver]:
+def get_temporal_solver(scheme: str) -> type[TemporalSolver]:
     if scheme in _SCHEMES.keys():
         return _SCHEMES[scheme]
     raise ValueError(f"Scheme {scheme} not found. Options are:\n" 
