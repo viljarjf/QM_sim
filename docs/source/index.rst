@@ -7,13 +7,9 @@ Welcome to QM sim's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
-Contents
---------
-
-.. toctree::
    usage
    api
 

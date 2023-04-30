@@ -29,6 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest", "matplotlib"]
 torch = ["torch"]
+docs = ["sphinx", "sphinx-rtd-theme"]
 
 [build-system]
 requires = [
