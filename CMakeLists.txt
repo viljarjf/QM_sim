@@ -6,4 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(pybind11 CONFIG REQUIRED)
 
-add_subdirectory(src/qm_sim/cpp)
+# Commented out to remove need to build the cpp stuff.
+# The C++ files will stay for now, in case they are expanded upon in the future
+# add_subdirectory(src/qm_sim/cpp)
