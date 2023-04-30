@@ -1,10 +1,10 @@
 """
 PyTorch backend for finding eigenstates
 """
-from scipy import sparse as sp
+
 import numpy as np
 import torch
-
+from scipy import sparse as sp
 
 PYTORCH_DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

@@ -8,7 +8,7 @@ from scipy.sparse.linalg._eigen.arpack.arpack import _SymmetricArpackParams
 from scipy import sparse as sp
 import numpy as np
 
-def get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs):
+def get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs) -> tuple[np.ndarray, np.ndarray]:
     """Calculate `n` eigenvalues of `mat`. Reshape output to `shape`
 
     Args:

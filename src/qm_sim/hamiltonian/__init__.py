@@ -9,15 +9,14 @@ from .. import plot
 from ..spatial_derivative import get_scheme_order
 from ..spatial_derivative.cartesian import nabla, laplacian
 from ..temporal_solver import TemporalSolver, get_temporal_solver
-from .scipy_eigsh import get_eigen as scipy_get_eigen
-from .pytorch_eigsh import get_eigen as pytorch_get_eigen
+from .eigensolvers import get_eigensolver
 
 
 class Hamiltonian:
 
     def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, 
         spatial_scheme: str = "three-point", temporal_scheme: str = "leapfrog",
-        verbose: bool = True, eigensolver: str = "scipy"):
+        eigensolver: str = "scipy", verbose: bool = True):
         """Discrete hamiltonian of a system
 
         Args:
@@ -43,6 +42,12 @@ class Hamiltonian:
                     - crank-nicolson
                     - leapfrog
                 Defaults to "leapfrog"
+            eigensolver (str, optional):
+                Choose which eigensolver backend to use.
+                Options are:
+                    - scipy
+                    - torch (optional dependency, must be installed)
+                Defaults to "scipy"
             verbose (bool):
                 Option to display calculation and iteration info during runtime
                 True by default.
@@ -55,11 +60,8 @@ class Hamiltonian:
         self._dim = len(N)
         self.delta = [Li / Ni for Li, Ni in zip(L, N)]
         
-        if eigensolver == "pytorch" or eigensolver == "torch":
-            self.eigensolver = pytorch_get_eigen
-        elif eigensolver == "scipy":
-            self.eigensolver = scipy_get_eigen
-        else:
+        self.eigensolver = get_eigensolver(eigensolver)
+        if self.eigensolver is None:
             raise ValueError(f"Eigensolver {eigensolver} not found")
 
         order = get_scheme_order(spatial_scheme)
