@@ -8,17 +8,17 @@ from scipy import sparse as sp
 
 PYTORCH_DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs):
-    """Calculate `n` eigenvalues of `mat`. Reshape output to `shape`
+def torch_get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs):
+    """Calculate :code:`n` eigenvalues of :code:`mat`. Reshape output to :code:`shape`
 
-    Args:
-        mat (sp.dia_matrix): Matrix to calculate eigenvectors and -values
-        n (int): Amount of eigenvectors and -values to find
-        shape (tuple[int]): shape of eivenvectors
-
-    Returns:
-        np.ndarray: eigenvalues, shape (n,)
-        np.ndarray: eigenvectors, shape (n, *`shape`)
+    :param mat: Matrix to calculate eigenvectors and -values for
+    :type mat: sp.dia_matrix
+    :param n: Amount of eigenvectors and -values to calculate
+    :type n: int
+    :param shape: Output shape for eigenvectors
+    :type shape: tuple[int]
+    :return: eigenvalues, eigenvectors
+    :rtype: tuple[np.ndarray(shape = (:code:`n`)), np.ndarray(shape = (:code:`n`, :code:`shape`)]
     """
     H = spmatrix_to_tensor(mat)
     v, w = torch.lobpcg(H, k=n, largest=False)

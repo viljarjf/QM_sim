@@ -2,6 +2,8 @@
 
 Python library for simulation of quantum mechanical systems.
 
+[![.github/workflows/build_docs.yml](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml/badge.svg?branch=main&event=page_build)](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml)
+
 ## Features 
 - 1D and 2D systems
 - Choice of finite difference scheme
