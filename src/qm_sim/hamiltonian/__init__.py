@@ -1,3 +1,9 @@
+"""
+
+Real-space discretized Hamiltonian class, with solving and plotting functionality
+
+"""
+
 from typing import Callable, Any
 
 import numpy as np

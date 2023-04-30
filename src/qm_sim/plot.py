@@ -1,3 +1,8 @@
+"""
+
+Plots for the solutions to the Schrödinger equation
+
+"""
 from typing import Callable
 
 import numpy as np

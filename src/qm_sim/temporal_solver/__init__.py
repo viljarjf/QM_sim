@@ -1,3 +1,10 @@
+"""
+
+Classes to solve :math:`y' = f(y)`
+
+"""
+
+
 from .base import get_temporal_solver
 from .base import TemporalSolver
 
