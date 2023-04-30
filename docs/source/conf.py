@@ -21,6 +21,8 @@ extensions = [
     'sphinx.ext.autosummary',
 ]
 
+autosummary_generate = True  # Turn on sphinx.ext.autosummary
+
 templates_path = ['_templates']
 exclude_patterns = []
 
