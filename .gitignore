@@ -2,6 +2,7 @@ dist
 .venv
 .vscode
 build
+generated
 
 **/*.egg-info
 **/__pycache__
