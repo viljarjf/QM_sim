@@ -12,6 +12,7 @@ Welcome to QM sim's documentation!
 
    usage
    api
+   examples
 
 Indices and tables
 ==================
