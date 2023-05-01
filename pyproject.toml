@@ -18,11 +18,12 @@ classifiers = [
 dependencies = [
     "numpy>=1.23",
     "scipy>=1.10",
-    "tqdm>=4.64.1"
+    "tqdm>=4.64.1",
+    "matplotlib>=3.6"
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/viljarjf/QM_sim"
+"Homepage" = "https://viljarjf.github.io/QM_sim/"
 "Bug Tracker" = "https://github.com/viljarjf/QM_sim/issues"
 "Source" = "https://github.com/viljarjf/QM_sim"
 

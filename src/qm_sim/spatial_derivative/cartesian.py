@@ -7,9 +7,8 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
     """Finite difference derivative in cartesian coordinates.
     Uses central stencil.
 
-    Example:
-    
-    # Approximate the derivative of sin(x).
+    Example: approximate the derivative of sin(x).
+
     >>> from qm_sim.spatial_derivative.cartesian import nabla
     >>> import numpy as np
     >>> N = (1000,)
@@ -65,9 +64,8 @@ def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.f
     """Finite difference double derivative in cartesian coordinates.
     Uses central stencil
 
-    Example:
-    
-    # Approximate the second derivative of sin(x).
+    Example: approximate the second derivative of sin(x).
+
     >>> from qm_sim.spatial_derivative.cartesian import laplacian
     >>> import numpy as np
     >>> N = (1000,)
