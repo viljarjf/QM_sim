@@ -13,7 +13,7 @@ try:
     from .pytorch_eigen import torch_get_eigen
     __SOLVERS["pytorch"] = torch_get_eigen
     __SOLVERS["torch"] = torch_get_eigen
-except ImportError:
+except (ImportError, RuntimeError):
     # Maybe display a warning?
     pass
 

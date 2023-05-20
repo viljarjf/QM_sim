@@ -74,8 +74,8 @@ class Hamiltonian:
         if len(N) != len(L):
             raise ValueError("`N`and `L`must have same length")
         
-        self.N = N
-        self.L = L
+        self.N = tuple(N)
+        self.L = tuple(L)
         self._dim = len(N)
         self.delta = [Li / Ni for Li, Ni in zip(L, N)]
         
