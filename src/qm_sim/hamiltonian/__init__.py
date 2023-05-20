@@ -15,7 +15,7 @@ from .. import plot
 from ..spatial_derivative import get_scheme_order
 from ..spatial_derivative.cartesian import nabla, laplacian
 from ..temporal_solver import TemporalSolver, get_temporal_solver
-from .eigensolvers import get_eigensolver
+from ..eigensolvers import get_eigensolver
 from scipy.sparse.linalg import eigsh as adiabatic_eigsh
 
 
