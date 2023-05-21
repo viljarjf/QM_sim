@@ -23,7 +23,7 @@ class SpatialHamiltonian:
 
     def __init__(self, N: tuple, L: tuple, m: float | np.ndarray, 
         spatial_scheme: str = "three-point", temporal_scheme: str = "leapfrog",
-        eigensolver: str = "scipy", verbose: bool = True):
+        eigensolver: str = "scipy", verbose: bool = True, boundary_condition: str = "zero"):
         """Non-stationary Hamiltonian in real space.
 
         :param N: Discretization count along each axis
@@ -67,6 +67,14 @@ class SpatialHamiltonian:
         :param verbose: Option to display calculation and iteration info during runtime.
             Defaults to True
         :type verbose: bool, optional
+        :param boundary_condition: Which boundary condition to apply.
+            Options are:
+
+            - zero
+            - periodic
+
+            Defaults to "zero"
+        :type boundary_condition: str, optional
         """
        
         if len(N) != len(L):
@@ -94,15 +102,15 @@ class SpatialHamiltonian:
                 raise ValueError(f"Inconsistent shape of `m`: {m.shape}, should be {self.N}")
             m_inv = 1 / m.flatten()
 
-            _n = nabla(N, L, order)
-            _n2 = laplacian(N, L, order)
+            _n = nabla(N, L, order=order, boundary_condition=boundary_condition)
+            _n2 = laplacian(N, L, order=order, boundary_condition=boundary_condition)
 
             # nabla m_inv nabla + m_inv nabla^2
             _n.data *= _n @ m_inv   # First term
             _n2.data *= m_inv       # Second term
             self.mat = _n + _n2
         else:
-            self.mat = laplacian(N, L, order)
+            self.mat = laplacian(N, L, order=order, boundary_condition=boundary_condition)
             self.mat *= 1/m
         
         self._centerline_index = list(self.mat.offsets).index(0)

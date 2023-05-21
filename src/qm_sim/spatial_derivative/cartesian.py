@@ -3,7 +3,8 @@ import numpy as np
 from scipy import sparse as sp
 
 
-def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:
+def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64, 
+          boundary_condition: str = "zero") -> sp.dia_matrix:
     """Finite difference derivative in cartesian coordinates.
     Uses central stencil.
 
@@ -13,11 +14,11 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
     >>> import numpy as np
     >>> N = (1000,)
     >>> L = (2*np.pi,)
-    >>> n = nabla( N, L )
-    >>> x = np.linspace( 0, L[0], N[0] )
+    >>> n = nabla( N, L, boundary_condition="periodic")
+    >>> x = np.linspace( 0, L[0], N[0], endpoint=False )
     >>> y = np.sin(x)
-    # Now, the following estimates the second derivative of sin(x)
-    >>> n @ y
+    >>> np.allclose(n @ y, np.cos(x)) # The analytical solution is cos(x)
+    True
 
     :param N: Discretization count along each axis
     :type N: tuple[int]
@@ -39,6 +40,14 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
     :raises NotImplementedError: if requested order is not available
     :return: Discretized derivative matrix
     :rtype: sp.dia_matrix
+    :param boundary_condition: Which boundary condition to apply.
+            Options are:
+
+            - zero
+            - periodic
+
+            Defaults to "zero"
+        :type boundary_condition: str, optional
     """
     # Lookup for first half of stencil. 
     # A 0 is appended for the central element, 
@@ -55,12 +64,13 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
         case _:
             raise NotImplementedError(f"Finite difference scheme not found for {order = }")
     stencil += [0]
-    indices = _mirror_sign_list([-i for i in range(len(stencil))][::-1])
+
     stencil = _mirror_sign_list(stencil)
-    return _matrix_from_stencil(stencil, indices, 1, N, L, dtype)
+    return _matrix_from_central_stencil(stencil, 1, N, L, dtype, boundary_condition)
 
 
-def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64) -> sp.dia_matrix:
+def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float64, 
+              boundary_condition: str = "zero") -> sp.dia_matrix:
     """Finite difference double derivative in cartesian coordinates.
     Uses central stencil
 
@@ -70,11 +80,11 @@ def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.f
     >>> import numpy as np
     >>> N = (1000,)
     >>> L = (2*np.pi,)
-    >>> n = laplacian( N, L )
-    >>> x = np.linspace( 0, L[0], N[0] )
+    >>> n = laplacian( N, L, boundary_condition="periodic" )
+    >>> x = np.linspace( 0, L[0], N[0], endpoint=False)
     >>> y = np.sin(x)
-    # Now, the following estimates the second derivative of sin(x)
-    >>> n @ y
+    >>> np.allclose(n @ y, -np.sin(x)) # The analytical solution is -sin(x)
+    True
 
     :param N: Discretization count along each axis
     :type N: tuple[int]
@@ -96,6 +106,14 @@ def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.f
     :raises NotImplementedError: if requested order is not available
     :return: Discretized derivative matrix
     :rtype: sp.dia_matrix
+    :param boundary_condition: Which boundary condition to apply.
+            Options are:
+
+            - zero
+            - periodic
+
+            Defaults to "zero"
+        :type boundary_condition: str, optional
     """
     # lookup the first half of the stencil, to be mirrored later
     match order:
@@ -110,37 +128,62 @@ def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.f
         case _:
             raise NotImplementedError(f"Finite difference scheme not found for {order = }")
     
-    indices = _mirror_sign_list([-i for i in range(len(stencil))][::-1])
     stencil = _mirror_list(stencil)
-    return _matrix_from_stencil(stencil, indices, 2, N, L, dtype)
+    return _matrix_from_central_stencil(stencil, 2, N, L, dtype, boundary_condition)
     
 
-def _matrix_from_stencil(stencil: list[float], indices: list[int], 
-    power: int, N: tuple[int], L: tuple[float], dtype: type) -> sp.dia_matrix:
+def _matrix_from_central_stencil(stencil: list[float], power: int, 
+                         N: tuple[int], L: tuple[float], dtype: type, 
+                         boundary_condition: str = "zero") -> sp.dia_matrix:
     """
-    Creates a full matrix from a stencil and its corresponding indices.
+    Creates a full matrix from a central stencil. Determines indices from stencil
     """
 
-    # iteration setup
-    mat = 0
-    prev_N = 1
-    indices = np.array(indices)
+    available_boundary_conditions = ["zero", "periodic"]
+    if boundary_condition not in available_boundary_conditions:
+        raise ValueError(f"Invalid boundary condition: {boundary_condition}. Options are: " 
+                         + ", ".join(available_boundary_conditions))
 
-    for L, N in zip(L, N):
-        h = L / N
-        # create regular finite difference matrix for each iteration dimension
-        # but push the indices of the stencil out to account for the current dimension
+    if boundary_condition == "zero":
+        indices = np.arange(len(stencil)) - len(stencil) // 2
+        axis_indices = [indices for _ in N]
+
+    elif boundary_condition == "periodic":
+        indices = np.arange(len(stencil)) - len(stencil) // 2
+        # There might be different sizes for each axis.
+        # Therefore, we keep the updated indices for each axis
+        periodic_indices = [list() for _ in N]
+        periodic_stencil = []
+        for i, ind in enumerate(indices):
+            # Lower diagonals
+            if ind < 0:
+                for i, n in enumerate(N):
+                    periodic_indices[i].append(-n - ind)
+                periodic_stencil.append(stencil[i])
+            # Upper diagonals
+            elif ind > 0:
+                for i, n in enumerate(N):
+                    periodic_indices[i].append(n - ind)
+                periodic_stencil.append(stencil[i])
+            # Also keep the central diagonals
+            else:
+                for i in range(len(N)):
+                    periodic_indices[i] += list(indices)
+                periodic_stencil += stencil
+        axis_indices = np.array(periodic_indices)
+        stencil = np.array(periodic_stencil)
+
+    mat = np.zeros((1,1))    
+    for l, n, indices in zip(L, N, axis_indices):
+        h = l / n
         next_mat = 1/h**power * sp.diags(
             stencil,
-            indices * prev_N,
-            shape=(N * prev_N, N * prev_N),
+            indices,
+            shape=(n, n),
             dtype=dtype,
             format="dia"
             )
-        
-        # Expand the previous iteration with the new one
-        mat = next_mat + sp.kron(sp.eye(N), mat, format="dia")
-        prev_N *= N
+        mat = sp.kronsum(mat, next_mat, format="dia")
 
     return mat
 
