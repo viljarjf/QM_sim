@@ -20,6 +20,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
+    'sphinx_mdinclude'
 ]
 
 
