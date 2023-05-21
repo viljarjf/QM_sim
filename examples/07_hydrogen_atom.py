@@ -13,7 +13,7 @@ N = (60, 60, 60)            # Discretisation point count
 L = (1e-9, 1e-9, 1e-9)      # System size in meters
 m = m_e * m_p / (m_e + m_p) # Mass of the particle, here the reduced mass of the system
 
-nx, ny = 5, 5               # Used for the plot
+nx, ny = 2, 2               # Used for the plot
 n = nx * ny                 # Number of orbitals to find
 
 # Initialize the hamiltonian.
@@ -29,7 +29,7 @@ energies, orbitals = H.eigen(n)
 orbitals = np.abs(orbitals**2)
 
 # Plot a iso-surface of each orbital
-plt.figure(0, (10, 10), 200)
+plt.figure()
 plots = []
 for i in range(n):
     iso_val = np.mean(orbitals[i])
