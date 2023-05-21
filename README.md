@@ -2,19 +2,22 @@
 
 Python library for simulation of quantum mechanical systems.
 
-[![.github/workflows/build_docs.yml](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml/badge.svg?branch=main&event=page_build)](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml)
+[![Build docs](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml/badge.svg)](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml)
+
+[//]: # (This is a comment. This comment should be on line 7. If this changes, also change the hard-coded line number for the start-line for the mdinclude at the top of docs/source/index.rst )
 
 ## Features 
-- 1D and 2D systems
+- 1D, 2D, and 3D systems
 - Choice of finite difference scheme
+- Zero and periodic boundary conditions
 - Stationary and temporal solutions
 - Plots
 
 ## Planned features
-- Boundary conditions
-- 3D systems
 - Transfer matrix for transmission ect.
-- Testing
+- Proper testing
+
+[//]: # (This is a comment. This comment should be on line 20. If this changes, also change the hard-coded line number for the end-line for the mdinclude at the top of docs/source/index.rst )
 
 ## Installation
 

@@ -36,3 +36,9 @@ Temporal evolution of a 2D system
 
 .. literalinclude:: ../../examples/06_2D_temporal_evolution.py
    :language: python
+
+Hydrogen atom
+---------------------------------
+
+.. literalinclude:: ../../examples/07_hydrogen_atom.py
+   :language: python

@@ -3,24 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Python library for simulation of quantum mechanical systems.
-============================================================
+QM-sim
+======
 
-Features 
---------
+A python library for simulation of quantum mechanical systems.
 
-- 1D and 2D systems
-- Choice of finite difference scheme
-- Stationary and temporal solutions
-- Plots
-- CPU and GPU calculations
 
-Planned features
-----------------
-- Boundary conditions
-- 3D systems
-- Transfer matrix for transmission ect.
-- Testing
+.. mdinclude:: ../../README.md
+   :start-line: 7
+   :end-line: 20
 
 .. toctree::
    :maxdepth: 1
