@@ -1,5 +1,12 @@
+"""
+
+Classes to solve :math:`y' = f(y)`
+
+"""
+
+
 from .base import get_temporal_solver
-from .base import BaseTemporalDerivative as TemporalDerivative
+from .base import TemporalSolver
 
 # Tell python where to find subclasses
 from .crank_nicolson import CrankNicolson

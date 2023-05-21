@@ -22,20 +22,10 @@ V[
     N[0] // 2 - N[0] // 5 : N[0] // 2 + N[0] // 5, 
     N[1] // 2 - N[1] // 5 : N[1] // 2 + N[1] // 5
 ] = 0
+H.V = V
 
-H.set_potential(V)
+# Plot potential
+H.plot_potential()
 
-# Solve the system
-energies, states = H.eigen(n)
-
-# Plot results
-from matplotlib import pyplot as plt
-plt.figure()
-plt.suptitle("$|\Psi|^2$")
-for i in range(n):
-    plt.subplot(2, 2, i+1)
-    plt.imshow(abs(states[i])**2)
-    plt.title(f"E$_{i}$ = {energies[i] / e_0 :.3f} eV")
-    plt.axis("off")
-plt.tight_layout()
-plt.show()
+# Plot eigenstate
+H.plot_eigen(n)

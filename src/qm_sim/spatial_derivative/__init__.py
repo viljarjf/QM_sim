@@ -1,3 +1,9 @@
+"""
+
+Discretized :math:`\\nabla` and :math:`\\nabla^2`
+
+"""
+
 _SCHEMES = {
     "three-point": 2,
     "five-point": 4,

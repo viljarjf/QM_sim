@@ -1,26 +1,38 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from ...nature_constants import h_bar
-from .base import BaseTemporalDerivative
+from .base import TemporalSolver
 
-class ScipySolver(BaseTemporalDerivative):
+
+class ScipySolver(TemporalSolver):
+    """Base class for scipy's :code:`solve_ivp`-based solvers"""
+
+    #: Name of the :code:`solve_ivp` method
     method: str
 
     _skip_registration = True
 
-    def iterate(self, t_final: float, dt_storage: float = None) -> tuple[np.ndarray, np.ndarray]:
+    def iterate(self, v_0: np.ndarray, t0: float, t_final: float, 
+        dt: float, dt_storage: float = None, verbose: bool = True) -> tuple[np.ndarray, np.ndarray]:
+        
+        pbar = self.tqdm(t0, t_final, verbose)
+
+        # Precalculate the coefficient for negligible speedup
+
+        def ode_fun(t, y):
+            pbar.progress(t)
+            return self.H(t) @ y
+
         sol = solve_ivp(
-            lambda t, y: (self.H(t) @ y) / (1j*h_bar), 
-            [0, t_final], 
-            self.v_0.astype(np.complex128), 
-            t_eval=np.arange(0, t_final, dt_storage),
-            first_step=self.dt,
-            # dense_output=True,
+            ode_fun, 
+            [t0, t_final], 
+            v_0.flatten(), 
+            t_eval=np.arange(t0, t_final, dt_storage),
+            first_step=dt,
             method=self.method,
             )
         t = sol.t
-        psi = [sol.y[:, i].reshape(*self.H.shape) for i in range(len(t))]
+        psi = [sol.y[:, i].reshape(*self.output_shape) for i in range(len(t))]
 
         return t, np.array(psi)
     

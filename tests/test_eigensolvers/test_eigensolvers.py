@@ -43,7 +43,10 @@ def test_eigensolvers():
 
     # NOTE: the Hamiltonian class does NOT use reduced units (yet)
     H3 = Hamiltonian(N, [1e-9*i for i in L], m_e)
-    H3.set_potential(np.array(V) * e_0)
+    H3.V = np.array(V) * e_0
+
+    H4 = Hamiltonian(N, [1e-9*i for i in L], m_e, eigensolver="pytorch")
+    H4.V = np.array(V) * e_0
 
     @timer(n_iter)
     def spectra():
@@ -72,14 +75,20 @@ def test_eigensolvers():
     @timer(n_iter)
     def qm_sim():
         return H3.eigen(k)
+    
+    @timer(n_iter)
+    def qm_sim_gpu():
+        return H4.eigen(k)
 
     a1 = spectra()[:, ::-1]
     w, a2 = scipy_cpp_op()
     w, a3 = scipy_numba_op()
-    _, a4 = qm_sim()
     _, a5 = scipy_matrix_op()
     scipy_matrix_op_nonsymmetric()
     scipy_numba_op_nonsymmetric()
+    _, a4 = qm_sim()
+    _, a6 = qm_sim_gpu()
+
 
     plt.figure()
     plt.subplot(1, 2, 1)
@@ -114,3 +123,30 @@ def test_eigensolvers():
     plt.title("Totally an eigenvector guys cmon")
     plt.legend(["$\lambda v$", "$Av$"])
     plt.show()
+
+def test_implemented_eigensolvers():
+
+    from qm_sim.hamiltonian import Hamiltonian
+    N = (200, 200)
+    k = 4
+    L = (10e-9, 10e-9)
+    n_iter = 1
+
+    V = e_0 * np.ones(N)
+
+    H1 = Hamiltonian(N, L, m_e, eigensolver="scipy")
+    H1.V = V
+
+    H2 = Hamiltonian(N, L, m_e, eigensolver="pytorch")
+    H2.V = V
+
+    @timer(n_iter)
+    def scipy_backend():
+        return H1.eigen(k)
+    
+    @timer(n_iter)
+    def pytorch_backend():
+        return H2.eigen(k)
+    
+    scipy_backend()
+    pytorch_backend()

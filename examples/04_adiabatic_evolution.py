@@ -26,7 +26,7 @@ def V(t):
     b = 0.15*e_0*expit(5*10**9*(Y-2.5e-9 - 1e-11*t)) + 0.15*e_0*expit(-5*10**9*(Y+2.5e-9+1e-11*t))
     return np.where(a+b>0.15*e_0,0.15*e_0,a+b)
 
-H.set_potential(V)
+H.V = V
 
 # Solve the system
 energies, states = H.eigen(n)

@@ -2,10 +2,13 @@
 
 Python library for simulation of quantum mechanical systems.
 
+[![.github/workflows/build_docs.yml](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml/badge.svg?branch=main&event=page_build)](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml)
+
 ## Features 
 - 1D and 2D systems
 - Choice of finite difference scheme
 - Stationary and temporal solutions
+- Plots
 
 ## Planned features
 - Boundary conditions
@@ -16,6 +19,12 @@ Python library for simulation of quantum mechanical systems.
 ## Installation
 
 `pip install qm-sim`
+
+To be able to use the [PyTorch](https://pytorch.org/) backend for eigenvalue calculations, run the following command: 
+
+`pip install qm-sim .[torch]`
+
+This will install the cpu-version of the package. To run GPU calculations, install the version for your system at the [PyTorch website](https://pytorch.org/get-started/locally/) instead.
 
 ## Usage
 
