@@ -47,7 +47,7 @@ def nabla(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.float
             - periodic
 
             Defaults to "zero"
-        :type boundary_condition: str, optional
+    :type boundary_condition: str, optional
     """
     # Lookup for first half of stencil. 
     # A 0 is appended for the central element, 
@@ -113,7 +113,7 @@ def laplacian(N: tuple[int], L: tuple[float], order: int = 2, dtype: type = np.f
             - periodic
 
             Defaults to "zero"
-        :type boundary_condition: str, optional
+    :type boundary_condition: str, optional
     """
     # lookup the first half of the stencil, to be mirrored later
     match order:

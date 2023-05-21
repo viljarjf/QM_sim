@@ -1,3 +1,13 @@
+"""
+Module for different solvers for eigenproblems
+
+Current options: 
+
+- scipy 
+- pytorch (optional dependency, must be installed)
+
+"""
+
 from typing import Callable
 import numpy as np
 from scipy import sparse as sp
