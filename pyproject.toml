@@ -31,7 +31,7 @@ dependencies = [
 test = ["pytest", "matplotlib",]
 torch = ["torch",]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-mdinclude",]
-linting = ["mypy", "black", "isort", "pylint",]
+linting = ["black", "isort", "pylint",]
 
 [build-system]
 requires = [

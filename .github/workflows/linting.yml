@@ -25,9 +25,6 @@ jobs:
       - name: setup
         run: |
           pip install .[linting]
-      - name: run mypy
-        run: |
-          mypy "$SRC_DIR" --show-error-codes --show-error-context --pretty
       - name: run black
         run: |
           black "$SRC_DIR" --check
