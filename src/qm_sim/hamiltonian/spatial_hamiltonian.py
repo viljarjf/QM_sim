@@ -4,6 +4,7 @@ Real-space discretized Hamiltonian class, with solving and plotting functionalit
 
 """
 
+from collections.abc import Iterable
 from typing import Any, Callable
 
 import numpy as np
@@ -22,8 +23,8 @@ from ..temporal_solver import TemporalSolver, get_temporal_solver
 class SpatialHamiltonian:
     def __init__(
         self,
-        N: tuple,
-        L: tuple,
+        N: tuple[int] | int,
+        L: tuple[float] | float,
         m: float | np.ndarray,
         spatial_scheme: str = "three-point",
         temporal_scheme: str = "leapfrog",
@@ -34,9 +35,9 @@ class SpatialHamiltonian:
         """Non-stationary Hamiltonian in real space.
 
         :param N: Discretization count along each axis
-        :type N: tuple
+        :type N: tuple[int] | int
         :param L: System size along each axis
-        :type L: tuple
+        :type L: tuple[float] | float
         :param m: Mass of the particle in the system.
             Can be constant (float) or vary in the simulation area (array).
             If an array is used, :code:`m.shape == N` must hold
@@ -83,14 +84,24 @@ class SpatialHamiltonian:
             Defaults to "zero"
         :type boundary_condition: str, optional
         """
+        # 1D inputs
+        if isinstance(N, int):
+            N = (N,)
+        if isinstance(L, float):
+            L = (L,)
+
+        # Input checking
+        if not isinstance(N, tuple) and isinstance(N, Iterable):
+            self.N = tuple(N)
+        else:
+            raise ValueError(f"Param `N` must be int or tuple, got {type(N)}")
+        if not isinstance(L, tuple) and isinstance(L, Iterable):
+            self.L = tuple(L)
+        else:
+            raise ValueError(f"Param `L` must be float or tuple, got {type(L)}")
 
         if len(N) != len(L):
             raise ValueError("`N`and `L`must have same length")
-
-        self.N = tuple(N)
-        self.L = tuple(L)
-        self._dim = len(N)
-        self.delta = [Li / Ni for Li, Ni in zip(L, N)]
 
         self.eigensolver = get_eigensolver(eigensolver)
         if self.eigensolver is None:
@@ -99,6 +110,9 @@ class SpatialHamiltonian:
         order = get_scheme_order(spatial_scheme)
         if order is None:
             raise ValueError("Requested finite difference is invalid")
+
+        self._dim = len(N)
+        self.delta = [Li / Ni for Li, Ni in zip(L, N)]
 
         # Handle non-isotropic effective mass
         if isinstance(m, np.ndarray) and np.all(m == m.flat[0]):
