@@ -9,7 +9,10 @@ from scipy import sparse as sp
 from scipy.sparse.linalg import eigsh
 import numpy as np
 
-def scipy_get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs) -> tuple[np.ndarray, np.ndarray]:
+
+def scipy_get_eigen(
+    mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs
+) -> tuple[np.ndarray, np.ndarray]:
     """Calculate :code:`n` eigenvalues of :code:`mat`. Reshape output to :code:`shape`
 
     :param mat: Matrix to calculate eigenvectors and -values for
@@ -22,8 +25,7 @@ def scipy_get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs) -> 
     :rtype: tuple[np.ndarray(shape = (:code:`n`)), np.ndarray(shape = (:code:`n`, :code:`shape`)]
     """
     if kwargs.get("sigma") is None:
-        v, w = _eigsh(mat._mul_vector, mat.shape[0], 
-            mat.dtype, k=n, **kwargs)
+        v, w = _eigsh(mat._mul_vector, mat.shape[0], mat.dtype, k=n, **kwargs)
     else:
         # Fallback to default solver
         v, w = eigsh(mat, k=n, which="SA", **kwargs)
@@ -34,22 +36,45 @@ def scipy_get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs) -> 
     return v, w
 
 
-def _eigsh(A_OP, n, dtype, k=6, sigma=None, which='SA', v0=None,
-          ncv=None, maxiter=None, tol=0, return_eigenvectors=True,
-          ):
+def _eigsh(
+    A_OP,
+    n,
+    dtype,
+    k=6,
+    sigma=None,
+    which="SA",
+    v0=None,
+    ncv=None,
+    maxiter=None,
+    tol=0,
+    return_eigenvectors=True,
+):
     """Copied from the scipy sourcecode, removing some overhead.
     See https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigsh.html
     """
     mode = 1
     M_matvec = None
     Minv_matvec = None
-    params = _SymmetricArpackParams(n, k, dtype.char, A_OP, mode,
-                                    M_matvec, Minv_matvec, sigma,
-                                    ncv, v0, maxiter, which, tol)
+    params = _SymmetricArpackParams(
+        n,
+        k,
+        dtype.char,
+        A_OP,
+        mode,
+        M_matvec,
+        Minv_matvec,
+        sigma,
+        ncv,
+        v0,
+        maxiter,
+        which,
+        tol,
+    )
 
-    with ReentrancyLock("Nested calls to eigs/eighs not allowed: "
-        "ARPACK is not re-entrant"):
+    with ReentrancyLock(
+        "Nested calls to eigs/eighs not allowed: " "ARPACK is not re-entrant"
+    ):
         while not params.converged:
             params.iterate()
 
-        return params.extract(return_eigenvectors)    
+        return params.extract(return_eigenvectors)

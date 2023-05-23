@@ -6,7 +6,8 @@ import numpy as np
 import torch
 from scipy import sparse as sp
 
-PYTORCH_DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+PYTORCH_DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def torch_get_eigen(mat: sp.dia_matrix, n: int, shape: tuple[int], **kwargs):
     """Calculate :code:`n` eigenvalues of :code:`mat`. Reshape output to :code:`shape`
