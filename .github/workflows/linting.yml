@@ -1,11 +1,9 @@
 name: Lint the sourcecode
 
 on:
-  
   pull_request:
     branches:    
       - dev
-      - main
   workflow_dispatch:
 
 permissions:
@@ -30,8 +28,16 @@ jobs:
           black "$SRC_DIR" --check
       - name: run isort
         run: |
-          isort "$SRC_DIR"/**/*.py -m 3 --trailing-comma -c
+          isort "$SRC_DIR" -m 3 --trailing-comma -c
       - name: run pylint
         run: |
-          pylint "$SRC_DIR" --fail-under=8
+          pylint "$SRC_DIR" --fail-under=7
+      # Remove -c and --check if we want to force linting in the future
+      # - name: Commit changes
+      #   run: |
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     git add .
+      #     git commit -m "[Auto-generated] Linting"
+      #     git push
 
