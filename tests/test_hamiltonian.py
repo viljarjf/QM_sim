@@ -10,7 +10,7 @@ from qm_sim import nature_constants as const
 
 
 def test_constant_mass():
-    H = Hamiltonian((10,), (1,), 1, spatial_scheme="nine-point", verbose=False)
+    H = Hamiltonian(10, 1, 1, spatial_scheme="nine-point", verbose=False)
     plt.figure()
     plt.title("Constant mass hamiltonian")
     plt.imshow(H.asarray())
@@ -26,7 +26,7 @@ def test_constant_mass_2D():
     plt.show()
 
 def test_array_mass():
-    N = (200,)
+    N = 200
 
     # Source: 
     # https://www.researchgate.net/publication/260544509_Band-gap_shift_in_heavily_doped_n-type_Al03Ga07As_alloys
@@ -39,16 +39,16 @@ def test_array_mass():
     kernel = np.ones((n)) / n
 
     m = m_algaas * np.ones(N)
-    m[N[0] // 2 - N[0] // 6 : N[0] // 2 + N[0] // 6] = m_gaas
+    m[N // 2 - N // 6 : N // 2 + N // 6] = m_gaas
     m *= const.m_e
     m = convolve(m, kernel, mode="same")
 
     V = V_algaas * np.ones(N)
-    V[N[0] // 2 - N[0] // 6 : N[0] // 2 + N[0] // 6] = V_gaas
+    V[N // 2 - N // 6 : N // 2 + N // 6] = V_gaas
     V *= const.e_0
     V = convolve(V, kernel, mode="same")
 
-    H = Hamiltonian(N, (20e-9, ), m, verbose=False)
+    H = Hamiltonian(N, 20e-9, m, verbose=False)
     H.V = V
 
     H.plot_potential()
@@ -70,15 +70,15 @@ def test_array_mass():
     plt.show()
 
 def test_potential():
-    N = (100,)
-    L = (2e-9,)
+    N = 100
+    L = 2e-9
 
     r = np.ones(N)
     m = const.m_e * r
     n = 5
 
     H0 = Hamiltonian(N, L, m, spatial_scheme="three-point", verbose=False)
-    z = np.linspace(-L[0]/2, L[0]/2, N[0])
+    z = np.linspace(-L/2, L/2, N)
     V = 100*z**2
     H0.V = V
 
@@ -98,8 +98,8 @@ def test_potential():
     plt.show()
 
 def test_eigen():
-    N = (100,)
-    L = (2e-9,)
+    N = 100
+    L = 2e-9
 
     r = np.ones(N)
     m = const.m_e * r
@@ -121,8 +121,8 @@ def test_eigen():
     plt.show()
 
 def test_temporal():
-    N = (200,)
-    L = (2e-9,)
+    N = 200
+    L = 2e-9
     m = const.m_e
     t_end = 10e-15
     dt = 1e-17
@@ -132,7 +132,7 @@ def test_temporal():
     for scheme in schemes:
         H.append(Hamiltonian(N, L, m, temporal_scheme=scheme, verbose=False))
 
-    z = np.linspace(-L[0]/2, L[0]/2, N[0])
+    z = np.linspace(-L/2, L/2, N)
     Vt = lambda t: 6*z**2 + 3*z*np.abs(z)*np.sin(4e15*t)
     for Hi in H:
         Hi.V = Vt
