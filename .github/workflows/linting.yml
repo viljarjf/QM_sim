@@ -11,6 +11,9 @@ on:
 permissions:
   contents: write
 
+env:
+  SRC_DIR: src
+
 jobs:
   lint:
 
@@ -18,7 +21,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Python Linter
-        uses: sunnysid3up/python-linter@master
-        with:
-          source: "src"
+      - uses: actions/setup-python@v3
+      - name: setup
+        run: |
+          pip install mypy black isort pylint
+      - name: run mypy
+        run: |
+          mypy "$SRC_DIR" --show-error-codes --show-error-context --pretty
+      - name: run black
+        run: |
+          black "$SRC_DIR" --check
+      - name: run isort
+        run: |
+          isort "$SRC_DIR"/**/*.py -m 3 --trailing-comma -c
+      - name: run pylint
+        run: |
+          pylint "$SRC_DIR" --fail-under=8
+
