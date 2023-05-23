@@ -150,9 +150,9 @@ class SpatialHamiltonian:
     def V(self, V: np.ndarray | Callable[[float], np.ndarray]):
         """Set a (potentially time dependent) potential for the QM-system's Hamiltonian
 
-        :param V: The energetic value of the potential at a given point associated with 
+        :param V: The energetic value of the potential at a given point associated with
             given array indices,
-            if callable, the call variable will represent a changable parameter 
+            if callable, the call variable will represent a changable parameter
             (usually time) with a return type identical to the static case where V is an np.ndarray
         :type V: np.ndarray | Callable[[float], np.ndarray]
         """
@@ -167,12 +167,12 @@ class SpatialHamiltonian:
         self._V = V
 
     def eigen(self, n: int, t: float = 0, **kwargs) -> tuple[np.ndarray, np.ndarray]:
-        """Calculate the n smallest eigenenergies and the corresponding eigenstates of 
+        """Calculate the n smallest eigenenergies and the corresponding eigenstates of
         the hamiltonian
 
         :param n: Amount of eigenenergies/states to output
         :type n: int
-        :param t: If the potential is time-dependent, solves the Time-independent 
+        :param t: If the potential is time-dependent, solves the Time-independent
             Schrödinger eq. as if it was frozen at time t.
             Does nothing if potential is time-independent.
             Defaults to 0
@@ -210,11 +210,11 @@ class SpatialHamiltonian:
         energy (close to) :code:`E_n` using the Adiabatic approximation.
         https://en.wikipedia.org/wiki/Adiabatic_theorem
 
-        Note: This is only valid given that the adiabatic theorem holds, ie. no degeneracy and a 
-        gap betweeneigenvalues. Current implementation assumes this holds and does not check if 
+        Note: This is only valid given that the adiabatic theorem holds, ie. no degeneracy and a
+        gap betweeneigenvalues. Current implementation assumes this holds and does not check if
         it does (yet?).
-        There is no mathematical guarantee (yet?) that the iterative solver will "hug" the 
-        correct eigenvector at every step, but it should be good if V varies smoothly enough and 
+        There is no mathematical guarantee (yet?) that the iterative solver will "hug" the
+        correct eigenvector at every step, but it should be good if V varies smoothly enough and
         :code:`dt` is small enough.
 
 
@@ -244,8 +244,8 @@ class SpatialHamiltonian:
             En_t[i], Psi_t[:, :, i] = self.eigen(
                 1,
                 t,
-                # smartly condition eigsolver to "hug" the single eigenvalue solution; 
-                # eigenvector and eigenvalue should be far closer to the previous one 
+                # smartly condition eigsolver to "hug" the single eigenvalue solution;
+                # eigenvector and eigenvalue should be far closer to the previous one
                 # than any other if the adiabatic theorem is fulfilled
                 sigma=En_t[i - 1],
                 v0=-Psi_t[:, :, i - 1],

@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 env:
-  SRC_DIR: src
+  SRC_DIR: src/qm_sim
 
 jobs:
   lint:

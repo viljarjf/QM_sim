@@ -48,6 +48,10 @@ wheel.expand-macos-universal-tags = true
 testpaths = ["tests"]
 addopts = "-raP"
 
+[tool.black]
+# this is a regex, not a list
+exclude = "nature_constants.py"
+
 [tool.pylint.'Basic']
 good-names = [
     "N", "L", "m", "x", "y", "z", "i", "j", "t", "t0", 

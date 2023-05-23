@@ -196,13 +196,14 @@ def _matrix_from_central_stencil(
     mat = np.zeros((1, 1))
     for l, n, indices in zip(L, N, axis_indices):
         h = l / n
-        next_mat = 1/h**power * sp.diags(
+        next_mat = sp.diags(
             stencil,
             indices,
             shape=(n, n),
             dtype=dtype,
             format="dia",
         )
+        next_mat *= 1 / h**power
         mat = sp.kronsum(mat, next_mat, format="dia")
 
     return mat
