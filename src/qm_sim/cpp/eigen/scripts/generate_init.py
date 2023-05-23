@@ -4,7 +4,8 @@ Script to generate an __init__.py-file for the C++ module
 
 """
 
-import sys, pathlib
+import pathlib
+import sys
 
 
 def main(module_name: str):

@@ -4,19 +4,19 @@ Real-space discretized Hamiltonian class, with solving and plotting functionalit
 
 """
 
-from typing import Callable, Any
+from typing import Any, Callable
 
 import numpy as np
 from scipy.sparse import dia_matrix
+from scipy.sparse.linalg import eigsh as adiabatic_eigsh
 from tqdm import tqdm
 
-from ..nature_constants import h_bar
 from .. import plot
-from ..spatial_derivative import get_scheme_order
-from ..spatial_derivative.cartesian import nabla, laplacian
-from ..temporal_solver import TemporalSolver, get_temporal_solver
 from ..eigensolvers import get_eigensolver
-from scipy.sparse.linalg import eigsh as adiabatic_eigsh
+from ..nature_constants import h_bar
+from ..spatial_derivative import get_scheme_order
+from ..spatial_derivative.cartesian import laplacian, nabla
+from ..temporal_solver import TemporalSolver, get_temporal_solver
 
 
 class SpatialHamiltonian:

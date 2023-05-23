@@ -9,6 +9,7 @@ Current options:
 """
 
 from typing import Callable
+
 import numpy as np
 from scipy import sparse as sp
 

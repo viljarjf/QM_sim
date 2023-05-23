@@ -3,11 +3,11 @@
 Use the scipy backend eigen solver to skip some overhead
 
 """
-from scipy._lib._threadsafety import ReentrancyLock
-from scipy.sparse.linalg._eigen.arpack.arpack import _SymmetricArpackParams
-from scipy import sparse as sp
-from scipy.sparse.linalg import eigsh
 import numpy as np
+from scipy import sparse as sp
+from scipy._lib._threadsafety import ReentrancyLock
+from scipy.sparse.linalg import eigsh
+from scipy.sparse.linalg._eigen.arpack.arpack import _SymmetricArpackParams
 
 
 def scipy_get_eigen(
