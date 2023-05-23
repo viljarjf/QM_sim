@@ -8,8 +8,8 @@ from qm_sim.nature_constants import m_e
 
 import numpy as np
 
-N = (1000,)     # Discretisation point count
-L = (1e-9,)     # System size in meters
+N = 1000        # Discretisation point count
+L = 1e-9        # System size in meters
 m = m_e         # Mass of the particle, here chosen as electron mass
 n = 4           # The amount of eigenstates to find
 
@@ -17,7 +17,7 @@ n = 4           # The amount of eigenstates to find
 H = Hamiltonian(N, L, m)
 
 # Set potential
-x = np.linspace(-L[0]/2, L[0]/2, N[0])
+x = np.linspace(-L/2, L/2, N)
 
 def V(t):
     k = 200
