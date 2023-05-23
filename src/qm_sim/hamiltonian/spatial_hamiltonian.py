@@ -90,18 +90,23 @@ class SpatialHamiltonian:
         if isinstance(L, float):
             L = (L,)
 
-        # Input checking
-        if not isinstance(N, tuple) and isinstance(N, Iterable):
-            self.N = tuple(N)
-        else:
-            raise ValueError(f"Param `N` must be int or tuple, got {type(N)}")
-        if not isinstance(L, tuple) and isinstance(L, Iterable):
-            self.L = tuple(L)
-        else:
+        # Allow any iterable that can be converted to a tuple
+        if isinstance(N, Iterable):
+            N = tuple(N)
+        if isinstance(L, Iterable):
+            L = tuple(L)
+
+        # Check type
+        if not isinstance(N, tuple) or not all(isinstance(i, int) for i in N):
+            raise ValueError(f"Param `N` must be int or tuple of ints, got {type(N)}")
+        if not isinstance(L, tuple) or not all(isinstance(i, float) for i in L):
             raise ValueError(f"Param `L` must be float or tuple, got {type(L)}")
 
         if len(N) != len(L):
             raise ValueError("`N`and `L`must have same length")
+        
+        self.N = N
+        self.L = L
 
         self.eigensolver = get_eigensolver(eigensolver)
         if self.eigensolver is None:
