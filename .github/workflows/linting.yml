@@ -1,0 +1,44 @@
+name: Lint the sourcecode
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  SRC_DIR: src/qm_sim
+
+jobs:
+  lint:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - name: setup
+        run: |
+          pip install .[linting]
+      - name: run black
+        run: |
+          black "$SRC_DIR" --check
+      - name: run isort
+        run: |
+          isort "$SRC_DIR" -m 3 --trailing-comma -c
+      - name: run pylint
+        run: |
+          pylint "$SRC_DIR" --fail-under=7
+      # Remove -c and --check if we want to force linting in the future
+      # - name: Commit changes
+      #   run: |
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     git add .
+      #     git commit -m "[Auto-generated] Linting"
+      #     git push
+

@@ -1,6 +1,6 @@
 [project]
 name = "qm_sim"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Viljar Femoen", email="author@example.com" },
 ]
@@ -28,9 +28,10 @@ dependencies = [
 "Source" = "https://github.com/viljarjf/QM_sim"
 
 [project.optional-dependencies]
-test = ["pytest", "matplotlib"]
-torch = ["torch"]
-docs = ["sphinx", "sphinx-rtd-theme", "sphinx-mdinclude"]
+test = ["pytest", "matplotlib",]
+torch = ["torch",]
+docs = ["sphinx", "sphinx-rtd-theme", "sphinx-mdinclude",]
+linting = ["black", "isort", "pylint",]
 
 [build-system]
 requires = [
@@ -46,3 +47,19 @@ wheel.expand-macos-universal-tags = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-raP"
+
+[tool.black]
+# this is a regex, not a list
+exclude = "nature_constants.py"
+
+[tool.pylint.'Basic']
+good-names = [
+    "N", "L", "m", "x", "y", "z", "i", "j", "t", "t0", 
+    "tn", "dt", "H", "h", "l", "n", "v", "w", "psi", "E", 
+    "V",
+] 
+
+[tool.pylint.'Main']
+ignore = [
+    "nature_constants.py",
+]
