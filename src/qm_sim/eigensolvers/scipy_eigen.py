@@ -72,7 +72,7 @@ def _eigsh(
     )
 
     with ReentrancyLock(
-        "Nested calls to eigs/eighs not allowed: " "ARPACK is not re-entrant"
+        "Nested calls to eigs/eighs not allowed: ARPACK is not re-entrant"
     ):
         while not params.converged:
             params.iterate()

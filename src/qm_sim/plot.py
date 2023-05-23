@@ -62,7 +62,7 @@ def eigen(E: np.ndarray, psi: np.ndarray):
     shape = _shape_from_int(n)
 
     plt.figure()
-    plt.suptitle("$|\Psi|^2$")
+    plt.suptitle("$|\\Psi|^2$")
     plot = _get_plot_fun(ndim)
     for i in range(n):
         plt.subplot(*shape, i + 1)
@@ -99,7 +99,7 @@ def temporal(t: np.ndarray, psi: np.ndarray, Vt: Callable[[float], np.ndarray]):
     (psi_plot,) = ax1_plot(psi2[0, :])
     (V_plot,) = ax2_plot(V[0, :] / e_0)
 
-    ax1.set_title(f"$|\Psi|^2$")
+    ax1.set_title(f"$|\\Psi|^2$")
     ax2.set_title("Potential [eV]")
     if ndim == 1:
         ax1.set_ylim(0, np.max(psi2) * 1.1)

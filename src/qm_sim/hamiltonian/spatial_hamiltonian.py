@@ -127,13 +127,8 @@ class SpatialHamiltonian:
         self._centerline_index = list(self.mat.offsets).index(0)
         self._default_data = None
 
-        # Prefactor in hamiltonian.
-        # Is either float or array, depending on `m`
-        h0 = -(h_bar**2) / 2
-
-        # Multiplying the diagonal data directly is easier
-        # if we have non-constant mass
-        self.mat.data *= h0
+        # Multiply the laplacian with the remaining factors
+        self.mat.data *= -(h_bar**2) / 2
 
         # static zero potential by default
         self._V = lambda t: np.zeros(shape=N)
@@ -155,9 +150,10 @@ class SpatialHamiltonian:
     def V(self, V: np.ndarray | Callable[[float], np.ndarray]):
         """Set a (potentially time dependent) potential for the QM-system's Hamiltonian
 
-        :param V: The energetic value of the potential at a given point associated with given array indices,
-                if callable, the call variable will represent a changable parameter (usually time) with a
-                return type identical to the static case where V is an np.ndarray
+        :param V: The energetic value of the potential at a given point associated with 
+            given array indices,
+            if callable, the call variable will represent a changable parameter 
+            (usually time) with a return type identical to the static case where V is an np.ndarray
         :type V: np.ndarray | Callable[[float], np.ndarray]
         """
         if not callable(V):
@@ -171,11 +167,13 @@ class SpatialHamiltonian:
         self._V = V
 
     def eigen(self, n: int, t: float = 0, **kwargs) -> tuple[np.ndarray, np.ndarray]:
-        """Calculate the n smallest eigenenergies and the corresponding eigenstates of the hamiltonian
+        """Calculate the n smallest eigenenergies and the corresponding eigenstates of 
+        the hamiltonian
 
         :param n: Amount of eigenenergies/states to output
         :type n: int
-        :param t: If the potential is time-dependent, solves the Time-independent Schrödinger eq. as if it was frozen at time t.
+        :param t: If the potential is time-dependent, solves the Time-independent 
+            Schrödinger eq. as if it was frozen at time t.
             Does nothing if potential is time-independent.
             Defaults to 0
         :type t: float, optional
@@ -195,27 +193,29 @@ class SpatialHamiltonian:
             E, psi = self.eigensolver(self(t), n, self.N)
 
         # calculate normalisation factor
-        nf = [psi[i, :] ** 2 for i in range(n)]
+        normalisation_factor = [psi[i, :] ** 2 for i in range(n)]
         for i, (L, N) in enumerate(zip(self.L, self.N)):
             dx = L / N
             for j in range(n):
-                nf[j] = np.trapz(nf[j], dx=dx)
+                normalisation_factor[j] = np.trapz(normalisation_factor[j], dx=dx)
         # normalise
         for i in range(n):
-            psi[i] /= nf[i] ** 0.5
+            psi[i] /= normalisation_factor[i] ** 0.5
         return E, psi
 
     def adiabatic_evolution(
         self, E_n: float, t0: float, dt: float, steps: int
     ) -> tuple[np.ndarray, np.ndarray]:
         """Adiabatically evolve an eigenstate with a slowly varying time-dependent potential with
-        energy (close to) E_n using the Adiabatic approximation.
+        energy (close to) :code:`E_n` using the Adiabatic approximation.
         https://en.wikipedia.org/wiki/Adiabatic_theorem
 
-        Note: This is only valid given that the adiabatic theorem holds, ie. no degeneracy and a gap between
-        eigenvalues. Current implementation assumes this holds and does not check if it does (yet?).
-        There is no mathematical guarantee (yet?) that the iterative solver will "hug" the correct eigenvector
-        at every step, but it should be good if V varies smoothly enough and dt is small enough.
+        Note: This is only valid given that the adiabatic theorem holds, ie. no degeneracy and a 
+        gap betweeneigenvalues. Current implementation assumes this holds and does not check if 
+        it does (yet?).
+        There is no mathematical guarantee (yet?) that the iterative solver will "hug" the 
+        correct eigenvector at every step, but it should be good if V varies smoothly enough and 
+        :code:`dt` is small enough.
 
 
         :param E_n: The Eigenvalue for you want to adiabatically evolve
@@ -244,8 +244,9 @@ class SpatialHamiltonian:
             En_t[i], Psi_t[:, :, i] = self.eigen(
                 1,
                 t,
-                # smartly condition eigsolver to "hug" the single eigenvalue solution; eigenvector and eigenvalue should be
-                # far closer to the previous one than any other if the adiabatic theorem is fulfilled
+                # smartly condition eigsolver to "hug" the single eigenvalue solution; 
+                # eigenvector and eigenvalue should be far closer to the previous one 
+                # than any other if the adiabatic theorem is fulfilled
                 sigma=En_t[i - 1],
                 v0=-Psi_t[:, :, i - 1],
                 is_adiabatic=True,
@@ -277,8 +278,8 @@ class SpatialHamiltonian:
         dt = 0.25 * h_bar / E_max
 
         # solve
-        f = lambda t: 1 / (1j * h_bar) * self.__call__(t)
-        solver = self._temporal_solver(f, self.shape)
+        func = lambda t: 1 / (1j * h_bar) * self.__call__(t)
+        solver = self._temporal_solver(func, self.shape)
         t, psi = solver.iterate(
             psi_0.astype(np.complex128), t0, t_final, dt, dt_storage, self.verbose
         )
