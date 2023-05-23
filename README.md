@@ -25,7 +25,7 @@ Python library for simulation of quantum mechanical systems.
 
 To be able to use the [PyTorch](https://pytorch.org/) backend for eigenvalue calculations, run the following command: 
 
-`pip install qm-sim .[torch]`
+`pip install qm-sim[torch]`
 
 This will install the cpu-version of the package. To run GPU calculations, install the version for your system at the [PyTorch website](https://pytorch.org/get-started/locally/) instead.
 
@@ -38,18 +38,31 @@ These are enumerated with increasing level of simulation complexity.
 
 To contribute, please open a pull request to the `dev`-branch on [GitHub](https://www.github.com/viljarjf/QM_sim/pulls).
 
+### Linting
+
+When opening a PR, a linting check is performed.
+To ensure your contribution passes the checks, you can run the following
+
+~~~bash
+$ pip install .[linting]
+$ black src/qm_sim
+$ isort src -m 3 --trailing-comma
+$ pylint src --fail-under=7
+~~~
+
+### Setup
+
 The following is an example of how to set up VS Code for development, adapt to your IDE of choice.
 
 TL;DR: 
 - `pip install -e .` to install in an editable state
-- `pip install .` to (re)compile the C++ (subsequent python file edits will not be recognized before another reinstall)
 
-### Requirements
+**Requirements**
 - VS Code
     - Python extension
 - Python 3.10 or above
 
-### Setup
+**Steps**
 1. Clone the repo recursively and open the repo in VS Code. If not cloned recursively, initialize the submodules with `git submodule update --init`
 2. Press f1, and run `Python: Create Environment`. Select `.venv`
 3. Open a new terminal, which should automatically use the virtual environment. If not, run `.venv\Scripts\activate` on Windows, or `source .venv/bin/activate` on Unix
