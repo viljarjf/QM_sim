@@ -28,9 +28,10 @@ dependencies = [
 "Source" = "https://github.com/viljarjf/QM_sim"
 
 [project.optional-dependencies]
-test = ["pytest", "matplotlib"]
-torch = ["torch"]
-docs = ["sphinx", "sphinx-rtd-theme", "sphinx-mdinclude"]
+test = ["pytest", "matplotlib",]
+torch = ["torch",]
+docs = ["sphinx", "sphinx-rtd-theme", "sphinx-mdinclude",]
+linting = ["mypy", "black", "isort", "pylint",]
 
 [build-system]
 requires = [

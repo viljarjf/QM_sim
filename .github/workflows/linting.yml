@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v3
       - name: setup
         run: |
-          pip install mypy black isort pylint
+          pip install .[linting]
       - name: run mypy
         run: |
           mypy "$SRC_DIR" --show-error-codes --show-error-context --pretty
