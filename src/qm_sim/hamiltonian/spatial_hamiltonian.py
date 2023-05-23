@@ -104,7 +104,7 @@ class SpatialHamiltonian:
 
         if len(N) != len(L):
             raise ValueError("`N`and `L`must have same length")
-        
+
         self.N = N
         self.L = L
 
