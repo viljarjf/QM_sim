@@ -2,8 +2,9 @@ name: Lint the sourcecode
 
 on:
   pull_request:
-    branches:    
+    branches:
       - dev
+      - main
   workflow_dispatch:
 
 permissions:
