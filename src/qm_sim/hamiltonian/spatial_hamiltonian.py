@@ -87,7 +87,7 @@ class SpatialHamiltonian:
         # 1D inputs
         if isinstance(N, int):
             N = (N,)
-        if isinstance(L, float):
+        if isinstance(L, (float, int)):
             L = (L,)
 
         # Allow any iterable that can be converted to a tuple
@@ -99,7 +99,7 @@ class SpatialHamiltonian:
         # Check type
         if not isinstance(N, tuple) or not all(isinstance(i, int) for i in N):
             raise ValueError(f"Param `N` must be int or tuple of ints, got {type(N)}")
-        if not isinstance(L, tuple) or not all(isinstance(i, float) for i in L):
+        if not isinstance(L, tuple) or not all(isinstance(i, (float, int)) for i in L):
             raise ValueError(f"Param `L` must be float or tuple, got {type(L)}")
 
         if len(N) != len(L):
