@@ -1,10 +1,10 @@
 import numpy as np
 from scipy import sparse as sp
-
+from typing import Iterable
 
 def nabla(
-    N: tuple[int],
-    L: tuple[float],
+    N: tuple[int] | int,
+    L: tuple[float] | float,
     order: int = 2,
     dtype: type = np.float64,
     boundary_condition: str = "zero",
@@ -16,8 +16,8 @@ def nabla(
 
     >>> from qm_sim.spatial_derivative.cartesian import nabla
     >>> import numpy as np
-    >>> N = (1000,)
-    >>> L = (2*np.pi,)
+    >>> N = 1000
+    >>> L = 2*np.pi
     >>> n = nabla( N, L, boundary_condition="periodic")
     >>> x = np.linspace( 0, L[0], N[0], endpoint=False )
     >>> y = np.sin(x)
@@ -25,9 +25,9 @@ def nabla(
     True
 
     :param N: Discretization count along each axis
-    :type N: tuple[int]
+    :type N: tuple[int] | int
     :param L: System size along each axis
-    :type L: tuple[float]
+    :type L: tuple[float] | float
     :param order: Numerical order of the differentiation scheme.
         Options are:
 
@@ -76,8 +76,8 @@ def nabla(
 
 
 def laplacian(
-    N: tuple[int],
-    L: tuple[float],
+    N: tuple[int] | int,
+    L: tuple[float] | float,
     order: int = 2,
     dtype: type = np.float64,
     boundary_condition: str = "zero",
@@ -89,8 +89,8 @@ def laplacian(
 
     >>> from qm_sim.spatial_derivative.cartesian import laplacian
     >>> import numpy as np
-    >>> N = (1000,)
-    >>> L = (2*np.pi,)
+    >>> N = 1000
+    >>> L = 2*np.pi
     >>> n = laplacian( N, L, boundary_condition="periodic" )
     >>> x = np.linspace( 0, L[0], N[0], endpoint=False)
     >>> y = np.sin(x)
@@ -98,9 +98,9 @@ def laplacian(
     True
 
     :param N: Discretization count along each axis
-    :type N: tuple[int]
+    :type N: tuple[int] | int
     :param L: System size along each axis
-    :type L: tuple[float]
+    :type L: tuple[float] | float
     :param order: Numerical order of the differentiation scheme.
         Options are:
 
@@ -148,14 +148,36 @@ def laplacian(
 def _matrix_from_central_stencil(
     stencil: list[float],
     power: int,
-    N: tuple[int],
-    L: tuple[float],
+    N: tuple[int] | int,
+    L: tuple[float] | float,
     dtype: type,
     boundary_condition: str = "zero",
 ) -> sp.dia_matrix:
     """
-    Creates a full matrix from a central stencil. Determines indices from stencil
+    Creates a full matrix from a central stencil. Determines indices from stencil.
     """
+    # Type check N and L
+    # 1D inputs
+    if isinstance(N, int):
+        N = (N,)
+    if isinstance(L, (float, int)):
+        L = (L,)
+
+    # Allow any iterable that can be converted to a tuple
+    if isinstance(N, Iterable):
+        N = tuple(N)
+    if isinstance(L, Iterable):
+        L = tuple(L)
+
+    # Check type
+    if not isinstance(N, tuple) or not all(isinstance(i, int) for i in N):
+        raise ValueError(f"Param `N` must be int or tuple of ints, got {type(N)}")
+    if not isinstance(L, tuple) or not all(isinstance(i, (float, int)) for i in L):
+        raise ValueError(f"Param `L` must be float or tuple, got {type(L)}")
+
+    if len(N) != len(L):
+        raise ValueError("`N`and `L`must have same length")
+
 
     available_boundary_conditions = ["zero", "periodic"]
     if boundary_condition not in available_boundary_conditions:
