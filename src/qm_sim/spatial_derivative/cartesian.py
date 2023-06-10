@@ -76,6 +76,41 @@ class CartesianDiscretization:
 
         L = (Ni * dxi for Ni, dxi in zip(N, dx))
         return cls(L, N)
+    
+    def get_coordinate_axes(self, centering: str = "middle") -> tuple[np.ndarray]:
+        """Return an array of shape (N_i,) for the ith dimension, with corresponding coordinates
+
+        :param centering: Where to place the origin.
+        Options:
+
+        - "middle" [default]: Center of system
+        - "first": First element in the array
+
+        :type centering: str, optional
+        :return: Coordinate axes
+        :rtype: tuple[np.ndarray]
+        """
+        if centering == "middle":
+            return (np.linspace(-Li/2, Li/2, Ni) for Li, Ni in zip(self.L, self.N))
+        elif centering == "first":
+            return (np.linspace(0, Li, Ni) for Li, Ni in zip(self.L, self.N))
+        else:
+            raise ValueError("Invalid centering parameters")
+    
+    def get_coordinate_arrays(self, centering: str = "middle") -> tuple[np.ndarray]:
+        """Return arrays with shape `N` of coordinates for each point in the system.
+
+        :param centering: Where to place the origin.
+        Options:
+
+        - "middle" [default]: Center of system
+        - "first": First element in the array
+
+        :type centering: str, optional
+        :return: Coordinate arrays
+        :rtype: tuple[np.ndarray]
+        """
+        return np.meshgrid(*self.get_coordinate_axes(centering))
 
 
 def nabla(
