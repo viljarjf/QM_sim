@@ -4,7 +4,6 @@ Real-space discretized Hamiltonian class, with solving and plotting functionalit
 
 """
 
-from collections.abc import Iterable
 from typing import Any, Callable
 
 import numpy as np
@@ -16,7 +15,11 @@ from .. import plot
 from ..eigensolvers import get_eigensolver
 from ..nature_constants import h_bar
 from ..spatial_derivative import get_scheme_order
-from ..spatial_derivative.cartesian import laplacian, nabla
+from ..spatial_derivative.cartesian import (
+    CartesianDiscretization,
+    laplacian,
+    nabla,
+)
 from ..temporal_solver import TemporalSolver, get_temporal_solver
 
 
@@ -84,29 +87,11 @@ class SpatialHamiltonian:
             Defaults to "zero"
         :type boundary_condition: str, optional
         """
-        # 1D inputs
-        if isinstance(N, int):
-            N = (N,)
-        if isinstance(L, (float, int)):
-            L = (L,)
-
-        # Allow any iterable that can be converted to a tuple
-        if isinstance(N, Iterable):
-            N = tuple(N)
-        if isinstance(L, Iterable):
-            L = tuple(L)
-
-        # Check type
-        if not isinstance(N, tuple) or not all(isinstance(i, int) for i in N):
-            raise ValueError(f"Param `N` must be int or tuple of ints, got {type(N)}")
-        if not isinstance(L, tuple) or not all(isinstance(i, (float, int)) for i in L):
-            raise ValueError(f"Param `L` must be float or tuple, got {type(L)}")
-
-        if len(N) != len(L):
-            raise ValueError("`N`and `L`must have same length")
-
-        self.N = N
-        self.L = L
+        # Creating this object performs the necessary type checking
+        self.discretization = CartesianDiscretization(L, N)
+        self.N = self.discretization.N
+        self.L = self.discretization.L
+        self.deltas = self.discretization.dx
 
         self.eigensolver = get_eigensolver(eigensolver)
         if self.eigensolver is None:
@@ -115,9 +100,6 @@ class SpatialHamiltonian:
         order = get_scheme_order(spatial_scheme)
         if order is None:
             raise ValueError("Requested finite difference is invalid")
-
-        self._dim = len(N)
-        self.delta = [Li / Ni for Li, Ni in zip(L, N)]
 
         # Handle non-isotropic effective mass
         if isinstance(m, np.ndarray) and np.all(m == m.flat[0]):
@@ -130,8 +112,12 @@ class SpatialHamiltonian:
                 )
             m_inv = 1 / m.flatten()
 
-            _n = nabla(N, L, order=order, boundary_condition=boundary_condition)
-            _n2 = laplacian(N, L, order=order, boundary_condition=boundary_condition)
+            _n = nabla(
+                self.discretization, order=order, boundary_condition=boundary_condition
+            )
+            _n2 = laplacian(
+                self.discretization, order=order, boundary_condition=boundary_condition
+            )
 
             # nabla m_inv nabla + m_inv nabla^2
             _n.data *= _n @ m_inv  # First term
@@ -139,7 +125,7 @@ class SpatialHamiltonian:
             self.mat = _n + _n2
         else:
             self.mat = laplacian(
-                N, L, order=order, boundary_condition=boundary_condition
+                self.discretization, order=order, boundary_condition=boundary_condition
             )
             self.mat *= 1 / m
 
@@ -427,3 +413,10 @@ class SpatialHamiltonian:
         :rtype: np.ndarray
         """
         return self.mat.toarray()
+
+    def get_coordinate_arrays(self) -> tuple[np.ndarray]:
+        return self.discretization.get_coordinate_arrays()
+
+    get_coordinate_arrays.__doc__ = (
+        CartesianDiscretization.get_coordinate_arrays.__doc__
+    )

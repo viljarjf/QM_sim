@@ -17,8 +17,7 @@ steps = 100
 H = Hamiltonian(N, L, m)
 
 # Set potential. Here, a square well is used, with dV = 0.15 eV
-x,y = np.linspace(-L[0]/2,L[0]/2, N[0]), np.linspace(-L[0]/2,L[0]/2, N[1])
-X, Y = np.meshgrid(x,y)
+X, Y = H.get_coordinate_arrays()
 
 # Smoothed rectangular time-dependent potential, assymetric to avoid degeneracy 
 def V(t):
