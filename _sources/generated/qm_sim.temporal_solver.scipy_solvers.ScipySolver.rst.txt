@@ -1,0 +1,38 @@
+qm\_sim.temporal\_solver.scipy\_solvers.ScipySolver
+===================================================
+
+.. currentmodule:: qm_sim.temporal_solver.scipy_solvers
+
+.. autoclass:: ScipySolver
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScipySolver.__init__
+      ~ScipySolver.iterate
+      ~ScipySolver.tqdm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScipySolver.method
+      ~ScipySolver.name
+      ~ScipySolver.order
+      ~ScipySolver.explicit
+      ~ScipySolver.stable
+   
+   

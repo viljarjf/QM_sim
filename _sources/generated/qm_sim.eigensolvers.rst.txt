@@ -1,0 +1,40 @@
+qm\_sim.eigensolvers
+====================
+
+.. automodule:: qm_sim.eigensolvers
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      get_eigensolver
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   qm_sim.eigensolvers.pytorch_eigen
+   qm_sim.eigensolvers.scipy_eigen
+

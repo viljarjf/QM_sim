@@ -1,0 +1,30 @@
+qm\_sim.eigensolvers.scipy\_eigen
+=================================
+
+.. automodule:: qm_sim.eigensolvers.scipy_eigen
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      scipy_get_eigen
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

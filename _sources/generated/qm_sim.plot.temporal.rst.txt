@@ -1,0 +1,6 @@
+qm\_sim.plot.temporal
+=====================
+
+.. currentmodule:: qm_sim.plot
+
+.. autofunction:: temporal

@@ -1,0 +1,37 @@
+qm\_sim.temporal\_solver.crank\_nicolson.CrankNicolson
+======================================================
+
+.. currentmodule:: qm_sim.temporal_solver.crank_nicolson
+
+.. autoclass:: CrankNicolson
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CrankNicolson.__init__
+      ~CrankNicolson.iterate
+      ~CrankNicolson.tqdm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CrankNicolson.explicit
+      ~CrankNicolson.name
+      ~CrankNicolson.order
+      ~CrankNicolson.stable
+   
+   

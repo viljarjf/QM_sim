@@ -1,0 +1,38 @@
+qm\_sim.temporal\_solver.crank\_nicolson
+========================================
+
+.. automodule:: qm_sim.temporal_solver.crank_nicolson
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      I_plus_aH
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      CrankNicolson
+   
+   
+
+   
+   
+   
+
+
+

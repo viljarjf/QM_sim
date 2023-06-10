@@ -1,0 +1,37 @@
+qm\_sim.temporal\_solver.leapfrog.Leapfrog
+==========================================
+
+.. currentmodule:: qm_sim.temporal_solver.leapfrog
+
+.. autoclass:: Leapfrog
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Leapfrog.__init__
+      ~Leapfrog.iterate
+      ~Leapfrog.tqdm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Leapfrog.explicit
+      ~Leapfrog.name
+      ~Leapfrog.order
+      ~Leapfrog.stable
+   
+   

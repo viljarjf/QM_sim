@@ -1,0 +1,6 @@
+qm\_sim.plot.eigen
+==================
+
+.. currentmodule:: qm_sim.plot
+
+.. autofunction:: eigen

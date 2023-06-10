@@ -1,0 +1,6 @@
+qm\_sim.eigensolvers.scipy\_eigen.scipy\_get\_eigen
+===================================================
+
+.. currentmodule:: qm_sim.eigensolvers.scipy_eigen
+
+.. autofunction:: scipy_get_eigen

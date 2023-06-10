@@ -1,0 +1,38 @@
+qm\_sim.temporal\_solver.base
+=============================
+
+.. automodule:: qm_sim.temporal_solver.base
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      get_temporal_solver
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      TemporalSolver
+   
+   
+
+   
+   
+   
+
+
+

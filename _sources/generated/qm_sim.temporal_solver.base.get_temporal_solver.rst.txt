@@ -1,0 +1,6 @@
+qm\_sim.temporal\_solver.base.get\_temporal\_solver
+===================================================
+
+.. currentmodule:: qm_sim.temporal_solver.base
+
+.. autofunction:: get_temporal_solver
