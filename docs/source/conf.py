@@ -9,7 +9,7 @@
 project = 'QM sim'
 copyright = '2023, Viljar Femoen'
 author = 'Viljar Femoen'
-release = '0.1.1'
+release = '0.1.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -14,7 +14,7 @@ dt = 1e-17              # Simulation data storage stepsize
 H = Hamiltonian(N, L, m, temporal_scheme="leapfrog")
 
 # Set the potential to a quadratic potential oscilating from side to side
-z = np.linspace(-L/2, L/2, N)
+z, = H.get_coordinate_arrays()
 H.V = lambda t: 6*z**2 + 3*z*np.abs(z)*np.sin(4e15*t)
 
 # Plot

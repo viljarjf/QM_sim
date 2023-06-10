@@ -20,7 +20,7 @@ n = nx * ny                 # Number of orbitals to find
 H = Hamiltonian(N, L, m)
 
 # Define the potential: -e^2 / (4*pi*𝜀_0*r)
-x, y, z = np.meshgrid(*(np.linspace(-L[i]/2, L[i]/2, N[i]) for i in range(3)))
+x, y, z = H.get_coordinate_arrays()
 r = (x**2 + y**2 + z**2)**0.5
 H.V = -e_0**2 / (4 * np.pi * 𝜀_0 * r)
 

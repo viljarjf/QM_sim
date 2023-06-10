@@ -1,6 +1,6 @@
 # QM_sim
 
-Python library for simulation of quantum mechanical systems.
+Python library for simulation of quantum mechanical systems. The documentation is available on [GitHub pages](https://viljarjf.github.io/QM_sim/).
 
 [![Build docs](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml/badge.svg)](https://github.com/viljarjf/QM_sim/actions/workflows/build_docs.yml)
 

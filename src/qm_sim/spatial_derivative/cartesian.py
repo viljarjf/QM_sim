@@ -1,10 +1,121 @@
+from typing import Iterable
+
 import numpy as np
 from scipy import sparse as sp
+from typing_extensions import Self
+
+
+class CartesianDiscretization:
+    """Helper class for discretization of cartesian space"""
+
+    def __init__(self, L: float | tuple[float], N: int | tuple[int]):
+        """Initialize a discretization objects. Allows non-tuple inputs
+
+        :param L: System size along each dimension
+        :type L: float | tuple[float]
+        :param N: Discretization count along each dimension
+        :type N: int | tuple[int]
+        """
+        # 1D inputs
+        if isinstance(N, int):
+            N = (N,)
+        if isinstance(L, (float, int)):
+            L = (L,)
+
+        # Allow any iterable that can be converted to a tuple
+        if isinstance(N, Iterable):
+            N = tuple(N)
+        if isinstance(L, Iterable):
+            L = tuple(L)
+
+        # Check type
+        if not isinstance(N, tuple) or not all(isinstance(i, int) for i in N):
+            raise ValueError(f"Param `N` must be int or tuple of ints, got {type(N)}")
+        if not isinstance(L, tuple) or not all(isinstance(i, (float, int)) for i in L):
+            raise ValueError(f"Param `L` must be float or tuple, got {type(L)}")
+
+        if len(N) != len(L):
+            raise ValueError("Inputs must have same length")
+
+        self.N = N
+        self.L = L
+        self.dx = (Li / Ni for Li, Ni in zip(self.L, self.N))
+
+    @classmethod
+    def from_dx(cls, dx: float | tuple[float], N: int | tuple[int]) -> Self:
+        """Initialize a discretization objects. Allows non-tuple inputs
+
+        :param dx: Discretzation length along each dimension,
+        i.e. distance between discretization points
+        :type dx: float | tuple[float]
+        :param N: Discretization count along each dimension
+        :type N: int | tuple[int]
+        """
+        if isinstance(N, int):
+            N = (N,)
+        if isinstance(dx, (float, int)):
+            dx = (dx,)
+
+        # Allow any iterable that can be converted to a tuple
+        if isinstance(N, Iterable):
+            N = tuple(N)
+        if isinstance(dx, Iterable):
+            dx = tuple(dx)
+
+        # Check type
+        if not isinstance(N, tuple) or not all(isinstance(i, int) for i in N):
+            raise ValueError(f"Param `N` must be int or tuple of ints, got {type(N)}")
+        if not isinstance(dx, tuple) or not all(
+            isinstance(i, (float, int)) for i in dx
+        ):
+            raise ValueError(f"Param `dx` must be float or tuple, got {type(dx)}")
+
+        if len(N) != len(dx):
+            raise ValueError("Inputs must have same length")
+
+        L = (Ni * dxi for Ni, dxi in zip(N, dx))
+        return cls(L, N)
+
+    def get_coordinate_axes(self, centering: str = "middle") -> tuple[np.ndarray]:
+        """Return an array of shape (N_i,) for the ith dimension, with corresponding coordinates
+
+        :param centering: Where to place the origin.
+            Options:
+
+            - "middle" [default]: Center of system
+            - "first": First element in the array
+
+        :type centering: str, optional
+        :return: Coordinate axes
+        :rtype: tuple[np.ndarray]
+        """
+        if centering == "middle":
+            return (np.linspace(-Li / 2, Li / 2, Ni) for Li, Ni in zip(self.L, self.N))
+        elif centering == "first":
+            return (
+                np.linspace(0, Li, Ni, endpoint=False) for Li, Ni in zip(self.L, self.N)
+            )
+        else:
+            raise ValueError("Invalid centering parameters")
+
+    def get_coordinate_arrays(self, centering: str = "middle") -> tuple[np.ndarray]:
+        """Return arrays with shape `N` of coordinates for each point in the system.
+
+        :param centering: Where to place the origin.
+            Options:
+
+            - "middle" [default]: Center of system
+            - "first": First element in the array
+
+        :type centering: str, optional
+        :return: Coordinate arrays
+        :rtype: tuple[np.ndarray]
+        """
+        return np.meshgrid(*self.get_coordinate_axes(centering))
 
 
 def nabla(
-    N: tuple[int],
-    L: tuple[float],
+    discretization: CartesianDiscretization,
     order: int = 2,
     dtype: type = np.float64,
     boundary_condition: str = "zero",
@@ -14,20 +125,19 @@ def nabla(
 
     Example: approximate the derivative of sin(x).
 
-    >>> from qm_sim.spatial_derivative.cartesian import nabla
+    >>> from qm_sim.spatial_derivative.cartesian import nabla, CartesianDiscretization
     >>> import numpy as np
-    >>> N = (1000,)
-    >>> L = (2*np.pi,)
-    >>> n = nabla( N, L, boundary_condition="periodic")
-    >>> x = np.linspace( 0, L[0], N[0], endpoint=False )
+    >>> disc = CartesianDiscretization(2*np.pi, 1000)
+    >>> n = nabla( disc, boundary_condition="periodic")
+    >>> x, = disc.get_coordinate_arrays( centering="first" )
     >>> y = np.sin(x)
     >>> np.allclose(n @ y, np.cos(x)) # The analytical solution is cos(x)
     True
 
     :param N: Discretization count along each axis
-    :type N: tuple[int]
+    :type N: tuple[int] | int
     :param L: System size along each axis
-    :type L: tuple[float]
+    :type L: tuple[float] | float
     :param order: Numerical order of the differentiation scheme.
         Options are:
 
@@ -72,12 +182,13 @@ def nabla(
     stencil += [0]
 
     stencil = _mirror_sign_list(stencil)
+    N = discretization.N
+    L = discretization.L
     return _matrix_from_central_stencil(stencil, 1, N, L, dtype, boundary_condition)
 
 
 def laplacian(
-    N: tuple[int],
-    L: tuple[float],
+    discretization: CartesianDiscretization,
     order: int = 2,
     dtype: type = np.float64,
     boundary_condition: str = "zero",
@@ -87,20 +198,19 @@ def laplacian(
 
     Example: approximate the second derivative of sin(x).
 
-    >>> from qm_sim.spatial_derivative.cartesian import laplacian
+    >>> from qm_sim.spatial_derivative.cartesian import laplacian, CartesianDiscretization
     >>> import numpy as np
-    >>> N = (1000,)
-    >>> L = (2*np.pi,)
-    >>> n = laplacian( N, L, boundary_condition="periodic" )
-    >>> x = np.linspace( 0, L[0], N[0], endpoint=False)
+    >>> disc = CartesianDiscretization(2*np.pi, 1000)
+    >>> n = laplacian( disc, boundary_condition="periodic")
+    >>> x, = disc.get_coordinate_arrays( centering="first" )
     >>> y = np.sin(x)
     >>> np.allclose(n @ y, -np.sin(x)) # The analytical solution is -sin(x)
     True
 
     :param N: Discretization count along each axis
-    :type N: tuple[int]
+    :type N: tuple[int] | int
     :param L: System size along each axis
-    :type L: tuple[float]
+    :type L: tuple[float] | float
     :param order: Numerical order of the differentiation scheme.
         Options are:
 
@@ -142,6 +252,8 @@ def laplacian(
             )
 
     stencil = _mirror_list(stencil)
+    N = discretization.N
+    L = discretization.L
     return _matrix_from_central_stencil(stencil, 2, N, L, dtype, boundary_condition)
 
 
@@ -154,7 +266,7 @@ def _matrix_from_central_stencil(
     boundary_condition: str = "zero",
 ) -> sp.dia_matrix:
     """
-    Creates a full matrix from a central stencil. Determines indices from stencil
+    Creates a full matrix from a central stencil. Determines indices from stencil.
     """
 
     available_boundary_conditions = ["zero", "periodic"]
