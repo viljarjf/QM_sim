@@ -2,7 +2,6 @@ from typing import Iterable
 
 import numpy as np
 from scipy import sparse as sp
-
 from typing_extensions import Self
 
 
@@ -76,7 +75,7 @@ class CartesianDiscretization:
 
         L = (Ni * dxi for Ni, dxi in zip(N, dx))
         return cls(L, N)
-    
+
     def get_coordinate_axes(self, centering: str = "middle") -> tuple[np.ndarray]:
         """Return an array of shape (N_i,) for the ith dimension, with corresponding coordinates
 
@@ -91,12 +90,14 @@ class CartesianDiscretization:
         :rtype: tuple[np.ndarray]
         """
         if centering == "middle":
-            return (np.linspace(-Li/2, Li/2, Ni) for Li, Ni in zip(self.L, self.N))
+            return (np.linspace(-Li / 2, Li / 2, Ni) for Li, Ni in zip(self.L, self.N))
         elif centering == "first":
-            return (np.linspace(0, Li, Ni, endpoint=False) for Li, Ni in zip(self.L, self.N))
+            return (
+                np.linspace(0, Li, Ni, endpoint=False) for Li, Ni in zip(self.L, self.N)
+            )
         else:
             raise ValueError("Invalid centering parameters")
-    
+
     def get_coordinate_arrays(self, centering: str = "middle") -> tuple[np.ndarray]:
         """Return arrays with shape `N` of coordinates for each point in the system.
 

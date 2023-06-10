@@ -4,7 +4,6 @@ Real-space discretized Hamiltonian class, with solving and plotting functionalit
 
 """
 
-from collections.abc import Iterable
 from typing import Any, Callable
 
 import numpy as np
@@ -16,7 +15,11 @@ from .. import plot
 from ..eigensolvers import get_eigensolver
 from ..nature_constants import h_bar
 from ..spatial_derivative import get_scheme_order
-from ..spatial_derivative.cartesian import laplacian, nabla, CartesianDiscretization
+from ..spatial_derivative.cartesian import (
+    CartesianDiscretization,
+    laplacian,
+    nabla,
+)
 from ..temporal_solver import TemporalSolver, get_temporal_solver
 
 
@@ -109,15 +112,21 @@ class SpatialHamiltonian:
                 )
             m_inv = 1 / m.flatten()
 
-            _n = nabla(self.discretization, order=order, boundary_condition=boundary_condition)
-            _n2 = laplacian(self.discretization, order=order, boundary_condition=boundary_condition)
+            _n = nabla(
+                self.discretization, order=order, boundary_condition=boundary_condition
+            )
+            _n2 = laplacian(
+                self.discretization, order=order, boundary_condition=boundary_condition
+            )
 
             # nabla m_inv nabla + m_inv nabla^2
             _n.data *= _n @ m_inv  # First term
             _n2.data *= m_inv  # Second term
             self.mat = _n + _n2
         else:
-            self.mat = laplacian(self.discretization, order=order, boundary_condition=boundary_condition)
+            self.mat = laplacian(
+                self.discretization, order=order, boundary_condition=boundary_condition
+            )
             self.mat *= 1 / m
 
         self._centerline_index = list(self.mat.offsets).index(0)
