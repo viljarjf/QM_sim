@@ -1,6 +1,8 @@
+from typing import Iterable
+
 import numpy as np
 from scipy import sparse as sp
-from typing import Iterable
+
 
 def nabla(
     N: tuple[int] | int,
@@ -177,7 +179,6 @@ def _matrix_from_central_stencil(
 
     if len(N) != len(L):
         raise ValueError("`N`and `L`must have same length")
-
 
     available_boundary_conditions = ["zero", "periodic"]
     if boundary_condition not in available_boundary_conditions:
