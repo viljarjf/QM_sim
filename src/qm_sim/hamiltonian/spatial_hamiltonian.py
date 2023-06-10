@@ -413,3 +413,10 @@ class SpatialHamiltonian:
         :rtype: np.ndarray
         """
         return self.mat.toarray()
+
+    def get_coordinate_arrays(self) -> tuple[np.ndarray]:
+        return self.discretization.get_coordinate_arrays()
+
+    get_coordinate_arrays.__doc__ = (
+        CartesianDiscretization.get_coordinate_arrays.__doc__
+    )
