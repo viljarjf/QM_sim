@@ -19,7 +19,6 @@ A python library for simulation of quantum mechanical systems.
 
    usage
    api
-   examples
    contribution
 
 Indices and tables
