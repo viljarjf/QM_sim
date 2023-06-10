@@ -93,7 +93,7 @@ class CartesianDiscretization:
         if centering == "middle":
             return (np.linspace(-Li/2, Li/2, Ni) for Li, Ni in zip(self.L, self.N))
         elif centering == "first":
-            return (np.linspace(0, Li, Ni) for Li, Ni in zip(self.L, self.N))
+            return (np.linspace(0, Li, Ni, endpoint=False) for Li, Ni in zip(self.L, self.N))
         else:
             raise ValueError("Invalid centering parameters")
     
@@ -114,8 +114,7 @@ class CartesianDiscretization:
 
 
 def nabla(
-    N: tuple[int] | int,
-    L: tuple[float] | float,
+    discretization: CartesianDiscretization,
     order: int = 2,
     dtype: type = np.float64,
     boundary_condition: str = "zero",
@@ -125,12 +124,11 @@ def nabla(
 
     Example: approximate the derivative of sin(x).
 
-    >>> from qm_sim.spatial_derivative.cartesian import nabla
+    >>> from qm_sim.spatial_derivative.cartesian import nabla, CartesianDiscretization
     >>> import numpy as np
-    >>> N = 1000
-    >>> L = 2*np.pi
-    >>> n = nabla( N, L, boundary_condition="periodic")
-    >>> x = np.linspace( 0, L[0], N[0], endpoint=False )
+    >>> disc = CartesianDiscretization(2*np.pi, 1000)
+    >>> n = nabla( disc, boundary_condition="periodic")
+    >>> x, = disc.get_coordinate_arrays( centering="first" )
     >>> y = np.sin(x)
     >>> np.allclose(n @ y, np.cos(x)) # The analytical solution is cos(x)
     True
@@ -183,12 +181,13 @@ def nabla(
     stencil += [0]
 
     stencil = _mirror_sign_list(stencil)
+    N = discretization.N
+    L = discretization.L
     return _matrix_from_central_stencil(stencil, 1, N, L, dtype, boundary_condition)
 
 
 def laplacian(
-    N: tuple[int] | int,
-    L: tuple[float] | float,
+    discretization: CartesianDiscretization,
     order: int = 2,
     dtype: type = np.float64,
     boundary_condition: str = "zero",
@@ -198,12 +197,11 @@ def laplacian(
 
     Example: approximate the second derivative of sin(x).
 
-    >>> from qm_sim.spatial_derivative.cartesian import laplacian
+    >>> from qm_sim.spatial_derivative.cartesian import laplacian, CartesianDiscretization
     >>> import numpy as np
-    >>> N = 1000
-    >>> L = 2*np.pi
-    >>> n = laplacian( N, L, boundary_condition="periodic" )
-    >>> x = np.linspace( 0, L[0], N[0], endpoint=False)
+    >>> disc = CartesianDiscretization(2*np.pi, 1000)
+    >>> n = laplacian( disc, boundary_condition="periodic")
+    >>> x, = disc.get_coordinate_arrays( centering="first" )
     >>> y = np.sin(x)
     >>> np.allclose(n @ y, -np.sin(x)) # The analytical solution is -sin(x)
     True
@@ -253,6 +251,8 @@ def laplacian(
             )
 
     stencil = _mirror_list(stencil)
+    N = discretization.N
+    L = discretization.L
     return _matrix_from_central_stencil(stencil, 2, N, L, dtype, boundary_condition)
 
 
