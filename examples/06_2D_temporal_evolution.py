@@ -16,9 +16,7 @@ H = Hamiltonian(N, L, m, temporal_scheme="scipy-Runge-Kutta 3(2)")
 # Set the potential. Use a cool elipse cross that rotates over time
 a = 2e-9
 b = 5e-9
-x = np.linspace(-L[0]/2, L[0]/2, N[0])
-y = np.linspace(-L[1]/2, L[1]/2, N[1])
-X, Y = np.meshgrid(x, y)
+X, Y = H.get_coordinate_arrays()
 def V(theta: float) -> np.ndarray:
     ct, st = np.cos(theta), np.sin(theta)
 

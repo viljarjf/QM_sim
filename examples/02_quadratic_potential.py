@@ -17,7 +17,7 @@ n = 4           # The amount of eigenstates to find
 H = Hamiltonian(N, L, m)
 
 # Set potential
-x = np.linspace(-L/2, L/2, N)
+x, = H.get_coordinate_arrays()
 
 def V(t):
     k = 200
