@@ -259,35 +259,14 @@ def laplacian(
 def _matrix_from_central_stencil(
     stencil: list[float],
     power: int,
-    N: tuple[int] | int,
-    L: tuple[float] | float,
+    N: tuple[int],
+    L: tuple[float],
     dtype: type,
     boundary_condition: str = "zero",
 ) -> sp.dia_matrix:
     """
     Creates a full matrix from a central stencil. Determines indices from stencil.
     """
-    # Type check N and L
-    # 1D inputs
-    if isinstance(N, int):
-        N = (N,)
-    if isinstance(L, (float, int)):
-        L = (L,)
-
-    # Allow any iterable that can be converted to a tuple
-    if isinstance(N, Iterable):
-        N = tuple(N)
-    if isinstance(L, Iterable):
-        L = tuple(L)
-
-    # Check type
-    if not isinstance(N, tuple) or not all(isinstance(i, int) for i in N):
-        raise ValueError(f"Param `N` must be int or tuple of ints, got {type(N)}")
-    if not isinstance(L, tuple) or not all(isinstance(i, (float, int)) for i in L):
-        raise ValueError(f"Param `L` must be float or tuple, got {type(L)}")
-
-    if len(N) != len(L):
-        raise ValueError("`N`and `L`must have same length")
 
     available_boundary_conditions = ["zero", "periodic"]
     if boundary_condition not in available_boundary_conditions:
