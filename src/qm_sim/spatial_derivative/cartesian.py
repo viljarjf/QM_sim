@@ -80,10 +80,10 @@ class CartesianDiscretization:
         """Return an array of shape (N_i,) for the ith dimension, with corresponding coordinates
 
         :param centering: Where to place the origin.
-        Options:
+            Options:
 
-        - "middle" [default]: Center of system
-        - "first": First element in the array
+            - "middle" [default]: Center of system
+            - "first": First element in the array
 
         :type centering: str, optional
         :return: Coordinate axes
@@ -102,10 +102,10 @@ class CartesianDiscretization:
         """Return arrays with shape `N` of coordinates for each point in the system.
 
         :param centering: Where to place the origin.
-        Options:
+            Options:
 
-        - "middle" [default]: Center of system
-        - "first": First element in the array
+            - "middle" [default]: Center of system
+            - "first": First element in the array
 
         :type centering: str, optional
         :return: Coordinate arrays
