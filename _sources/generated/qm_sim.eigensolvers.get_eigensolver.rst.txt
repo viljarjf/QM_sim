@@ -1,0 +1,6 @@
+qm\_sim.eigensolvers.get\_eigensolver
+=====================================
+
+.. currentmodule:: qm_sim.eigensolvers
+
+.. autofunction:: get_eigensolver

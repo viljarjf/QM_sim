@@ -1,0 +1,39 @@
+qm\_sim.spatial\_derivative
+===========================
+
+.. automodule:: qm_sim.spatial_derivative
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      get_scheme_order
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   cartesian
+

@@ -1,0 +1,35 @@
+qm\_sim.temporal\_solver
+========================
+
+.. automodule:: qm_sim.temporal_solver
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   base
+   crank_nicolson
+   leapfrog
+   scipy_solvers
+

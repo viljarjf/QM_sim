@@ -1,0 +1,38 @@
+qm\_sim.temporal\_solver.scipy\_solvers.DOP853
+==============================================
+
+.. currentmodule:: qm_sim.temporal_solver.scipy_solvers
+
+.. autoclass:: DOP853
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DOP853.__init__
+      ~DOP853.iterate
+      ~DOP853.tqdm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DOP853.explicit
+      ~DOP853.method
+      ~DOP853.name
+      ~DOP853.order
+      ~DOP853.stable
+   
+   

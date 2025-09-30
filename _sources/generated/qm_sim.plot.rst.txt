@@ -1,0 +1,32 @@
+qm\_sim.plot
+============
+
+.. automodule:: qm_sim.plot
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      eigen
+      potential
+      temporal
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

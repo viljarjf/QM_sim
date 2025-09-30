@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; QM sim 0.1.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=92734c54"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="QM-sim" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QM sim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#no-potential">No potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quadratic-potential">Quadratic potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#d-system">2D system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adiabatic-evolution">Adiabatic evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#temporal-evolution">Temporal evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#temporal-evolution-of-a-2d-system">Temporal evolution of a 2D system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hydrogen-atom">Hydrogen atom</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QM sim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>To use QM sim, first install it using pip:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>qm-sim
+</pre></div>
+</div>
+<p>To run calculations on a GPU, install the PyTorch version for your system at the
+<a class="reference external" href="https://pytorch.org/get-started/locally/">PyTorch website</a> as well</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+</section>
+<section id="no-potential">
+<h2>No potential<a class="headerlink" href="#no-potential" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">Calculate eigenenergies and eigenstates of a 1D system with zero potential</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.nature_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">m_e</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>         <span class="c1"># Discretisation point count</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">1e-9</span>        <span class="c1"># System size in meters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m_e</span>         <span class="c1"># Mass of the particle, here chosen as electron mass</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>           <span class="c1"># The amount of eigenstates to find</span>
+
+<span class="c1"># Set hamiltonian</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hamiltonian</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># Solve and plot the system</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_eigen</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="quadratic-potential">
+<h2>Quadratic potential<a class="headerlink" href="#quadratic-potential" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">Calculate eigenenergies and eigenstates of a 1D system with quadratic potential</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.nature_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">m_e</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>        <span class="c1"># Discretisation point count</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">1e-9</span>        <span class="c1"># System size in meters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m_e</span>         <span class="c1"># Mass of the particle, here chosen as electron mass</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>           <span class="c1"># The amount of eigenstates to find</span>
+
+<span class="c1"># Set hamiltonian</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hamiltonian</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># Set potential</span>
+<span class="n">x</span><span class="p">,</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_coordinate_arrays</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">V</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">H</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">V</span>
+
+<span class="c1"># Plot</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_potential</span><span class="p">()</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_eigen</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="d-system">
+<h2>2D system<a class="headerlink" href="#d-system" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">Calculate and plot eigenstates in a 2D potential</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.nature_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">m_e</span><span class="p">,</span> <span class="n">e_0</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>          <span class="c1"># Discretisation point count</span>
+<span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">8e-9</span><span class="p">,</span> <span class="mf">8e-9</span><span class="p">)</span>        <span class="c1"># System size in meters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m_e</span>                 <span class="c1"># Mass of the particle, here chosen as electron mass</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>                   <span class="c1"># The amount of eigenstates to find</span>
+
+<span class="c1"># Set hamiltonian</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hamiltonian</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># Set potential. Here, a square well is used, with dV = 0.15 eV</span>
+<span class="n">V</span> <span class="o">=</span> <span class="mf">0.15</span><span class="o">*</span><span class="n">e_0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">V</span><span class="p">[</span>
+    <span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span> <span class="p">:</span> <span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span><span class="p">,</span> 
+    <span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span> <span class="p">:</span> <span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span>
+<span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">H</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">V</span>
+
+<span class="c1"># Plot potential</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_potential</span><span class="p">()</span>
+
+<span class="c1"># Plot eigenstate</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_eigen</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="adiabatic-evolution">
+<h2>Adiabatic evolution<a class="headerlink" href="#adiabatic-evolution" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">FuncAnimation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">expit</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.nature_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">e_0</span><span class="p">,</span> <span class="n">m_e</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>              <span class="c1"># Discretisation point count</span>
+<span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">8e-9</span><span class="p">,</span> <span class="mf">8e-9</span><span class="p">)</span>        <span class="c1"># System size in meters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m_e</span>                 <span class="c1"># Mass of the particle, here chosen as electron mass</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>                   <span class="c1"># The amount of eigenstates to find</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="mi">100</span>
+
+
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hamiltonian</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># Set potential. Here, a square well is used, with dV = 0.15 eV</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_coordinate_arrays</span><span class="p">()</span>
+
+<span class="c1"># Smoothed rectangular time-dependent potential, assymetric to avoid degeneracy </span>
+<span class="k">def</span><span class="w"> </span><span class="nf">V</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mf">0.15</span><span class="o">*</span><span class="n">e_0</span><span class="o">*</span><span class="n">expit</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="mi">9</span><span class="o">*</span><span class="p">(</span><span class="n">X</span><span class="o">-</span><span class="mf">2e-9</span> <span class="o">+</span> <span class="mf">1e-11</span><span class="o">*</span><span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.15</span><span class="o">*</span><span class="n">e_0</span><span class="o">*</span><span class="n">expit</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="mi">9</span><span class="o">*</span><span class="p">(</span><span class="n">X</span><span class="o">+</span><span class="mf">2e-9</span><span class="o">-</span><span class="mf">1e-11</span><span class="o">*</span><span class="n">t</span><span class="p">))</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">0.15</span><span class="o">*</span><span class="n">e_0</span><span class="o">*</span><span class="n">expit</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="mi">9</span><span class="o">*</span><span class="p">(</span><span class="n">Y</span><span class="o">-</span><span class="mf">2.5e-9</span> <span class="o">-</span> <span class="mf">1e-11</span><span class="o">*</span><span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.15</span><span class="o">*</span><span class="n">e_0</span><span class="o">*</span><span class="n">expit</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="mi">9</span><span class="o">*</span><span class="p">(</span><span class="n">Y</span><span class="o">+</span><span class="mf">2.5e-9</span><span class="o">+</span><span class="mf">1e-11</span><span class="o">*</span><span class="n">t</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="o">&gt;</span><span class="mf">0.15</span><span class="o">*</span><span class="n">e_0</span><span class="p">,</span><span class="mf">0.15</span><span class="o">*</span><span class="n">e_0</span><span class="p">,</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+
+<span class="n">H</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">V</span>
+
+<span class="c1"># Solve the system</span>
+<span class="n">energies</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">eigen</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="c1"># Choose energy to follow</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">energies</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Evolve adiabatically</span>
+<span class="n">Energies</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">adiabatic_evolution</span><span class="p">(</span><span class="n">E_n</span><span class="o">=</span><span class="n">E</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+
+<span class="c1"># Create animation</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">psi</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">im2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">V</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">ims</span> <span class="o">=</span> <span class="p">[</span><span class="n">im</span><span class="p">,</span><span class="n">im2</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">():</span>
+    <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">psi</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">im2</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">V</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">im</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+    <span class="n">ims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">psi</span><span class="p">[:,:,</span><span class="n">j</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">V</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ims</span>
+
+<span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">update</span><span class="p">,</span> <span class="n">init_func</span><span class="o">=</span><span class="n">init</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">repeat</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">repeat_delay</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="temporal-evolution">
+<h2>Temporal evolution<a class="headerlink" href="#temporal-evolution" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.nature_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">e_0</span><span class="p">,</span> <span class="n">m_e</span>
+
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">200</span>                 <span class="c1"># Discretisation point count</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">2e-9</span>                <span class="c1"># System size in meters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m_e</span>                 <span class="c1"># Mass of the particle, here chosen as electron mass</span>
+<span class="n">t_end</span> <span class="o">=</span> <span class="mf">10e-15</span>          <span class="c1"># Simulation time</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-17</span>              <span class="c1"># Simulation data storage stepsize</span>
+
+<span class="c1"># Initialize the hamiltonian</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hamiltonian</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">temporal_scheme</span><span class="o">=</span><span class="s2">&quot;leapfrog&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set the potential to a quadratic potential oscilating from side to side</span>
+<span class="n">z</span><span class="p">,</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_coordinate_arrays</span><span class="p">()</span>
+<span class="n">H</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="mi">6</span><span class="o">*</span><span class="n">z</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">4e15</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+
+<span class="c1"># Plot</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_temporal</span><span class="p">(</span><span class="n">t_end</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="temporal-evolution-of-a-2d-system">
+<h2>Temporal evolution of a 2D system<a class="headerlink" href="#temporal-evolution-of-a-2d-system" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.nature_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">e_0</span><span class="p">,</span> <span class="n">m_e</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">convolve2d</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>          <span class="c1"># Discretisation point count</span>
+<span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">15e-9</span><span class="p">,</span> <span class="mf">15e-9</span><span class="p">)</span>      <span class="c1"># System size in meters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m_e</span>                 <span class="c1"># Mass of the particle, here chosen as electron mass</span>
+<span class="n">t_end</span> <span class="o">=</span> <span class="mf">100e-15</span>         <span class="c1"># Simulation time</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-16</span>              <span class="c1"># Simulation data storage stepsize</span>
+
+<span class="c1"># Initialize the hamiltonian.</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hamiltonian</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">temporal_scheme</span><span class="o">=</span><span class="s2">&quot;scipy-Runge-Kutta 3(2)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set the potential. Use a cool elipse cross that rotates over time</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mf">2e-9</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mf">5e-9</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_coordinate_arrays</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">V</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">ct</span><span class="p">,</span> <span class="n">st</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="n">e_0</span>
+    <span class="n">V</span><span class="p">[((</span><span class="n">X</span><span class="o">*</span><span class="n">ct</span> <span class="o">+</span> <span class="n">Y</span><span class="o">*</span><span class="n">st</span><span class="p">)</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">((</span><span class="n">X</span><span class="o">*</span><span class="n">st</span> <span class="o">-</span> <span class="n">Y</span><span class="o">*</span><span class="n">ct</span><span class="p">)</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">V</span><span class="p">[((</span><span class="n">X</span><span class="o">*</span><span class="n">ct</span> <span class="o">+</span> <span class="n">Y</span><span class="o">*</span><span class="n">st</span><span class="p">)</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">((</span><span class="n">X</span><span class="o">*</span><span class="n">st</span> <span class="o">-</span> <span class="n">Y</span><span class="o">*</span><span class="n">ct</span><span class="p">)</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Smooth out transition </span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">convolve2d</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="s2">&quot;wrap&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">V</span>
+    
+<span class="n">H</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">V</span><span class="p">(</span><span class="mf">1e14</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+
+<span class="c1"># Set initial condition to a</span>
+<span class="c1"># superposition of third and fourth eigenstate</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">eigen</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">psi_0</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">psi</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="c1"># Plot</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_potential</span><span class="p">()</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_eigen</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span><span class="o">.</span><span class="n">plot_temporal</span><span class="p">(</span><span class="n">t_end</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">psi_0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="hydrogen-atom">
+<h2>Hydrogen atom<a class="headerlink" href="#hydrogen-atom" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: this example uses skimage, available with:</span>
+<span class="c1"># `pip install scikit-image`</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">skimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">measure</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes3D</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qm_sim.nature_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">e_0</span><span class="p">,</span> <span class="n">𝜀_0</span><span class="p">,</span> <span class="n">m_e</span><span class="p">,</span> <span class="n">m_p</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>            <span class="c1"># Discretisation point count</span>
+<span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>      <span class="c1"># System size in meters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">m_e</span> <span class="o">*</span> <span class="n">m_p</span> <span class="o">/</span> <span class="p">(</span><span class="n">m_e</span> <span class="o">+</span> <span class="n">m_p</span><span class="p">)</span> <span class="c1"># Mass of the particle, here the reduced mass of the system</span>
+
+<span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span>               <span class="c1"># Used for the plot</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span>                 <span class="c1"># Number of orbitals to find</span>
+
+<span class="c1"># Initialize the hamiltonian.</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hamiltonian</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># Define the potential: -e^2 / (4*pi*𝜀_0*r)</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_coordinate_arrays</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+<span class="n">H</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="o">-</span><span class="n">e_0</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">𝜀_0</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>
+
+<span class="c1"># Find a couple eigenvalues</span>
+<span class="n">energies</span><span class="p">,</span> <span class="n">orbitals</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">eigen</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">orbitals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">orbitals</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Plot a iso-surface of each orbital</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">iso_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">orbitals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">measure</span><span class="o">.</span><span class="n">marching_cubes</span><span class="p">(</span><span class="n">orbitals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">iso_val</span><span class="p">,</span> <span class="n">spacing</span><span class="o">=</span><span class="n">L</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">plot_trisurf</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">faces</span><span class="p">,</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Spectral&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E = </span><span class="si">{</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="QM-sim" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Viljar Femoen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

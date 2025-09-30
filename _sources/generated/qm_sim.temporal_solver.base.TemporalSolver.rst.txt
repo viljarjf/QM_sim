@@ -1,0 +1,37 @@
+qm\_sim.temporal\_solver.base.TemporalSolver
+============================================
+
+.. currentmodule:: qm_sim.temporal_solver.base
+
+.. autoclass:: TemporalSolver
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TemporalSolver.__init__
+      ~TemporalSolver.iterate
+      ~TemporalSolver.tqdm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TemporalSolver.name
+      ~TemporalSolver.order
+      ~TemporalSolver.explicit
+      ~TemporalSolver.stable
+   
+   

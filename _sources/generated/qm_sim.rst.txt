@@ -1,0 +1,38 @@
+﻿qm\_sim
+=======
+
+.. automodule:: qm_sim
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   cpp
+   eigensolvers
+   hamiltonian
+   nature_constants
+   plot
+   spatial_derivative
+   temporal_solver
+

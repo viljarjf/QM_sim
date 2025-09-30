@@ -1,0 +1,6 @@
+qm\_sim.plot.potential
+======================
+
+.. currentmodule:: qm_sim.plot
+
+.. autofunction:: potential

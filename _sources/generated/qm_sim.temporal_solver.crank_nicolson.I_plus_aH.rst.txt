@@ -1,0 +1,6 @@
+qm\_sim.temporal\_solver.crank\_nicolson.I\_plus\_aH
+====================================================
+
+.. currentmodule:: qm_sim.temporal_solver.crank_nicolson
+
+.. autofunction:: I_plus_aH

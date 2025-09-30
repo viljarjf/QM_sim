@@ -1,0 +1,6 @@
+qm\_sim.spatial\_derivative.get\_scheme\_order
+==============================================
+
+.. currentmodule:: qm_sim.spatial_derivative
+
+.. autofunction:: get_scheme_order

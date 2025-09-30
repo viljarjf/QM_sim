@@ -1,0 +1,38 @@
+qm\_sim.temporal\_solver.scipy\_solvers.BDF
+===========================================
+
+.. currentmodule:: qm_sim.temporal_solver.scipy_solvers
+
+.. autoclass:: BDF
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BDF.__init__
+      ~BDF.iterate
+      ~BDF.tqdm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BDF.explicit
+      ~BDF.method
+      ~BDF.name
+      ~BDF.order
+      ~BDF.stable
+   
+   

@@ -1,0 +1,38 @@
+qm\_sim.temporal\_solver.scipy\_solvers.RungeKutta45
+====================================================
+
+.. currentmodule:: qm_sim.temporal_solver.scipy_solvers
+
+.. autoclass:: RungeKutta45
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RungeKutta45.__init__
+      ~RungeKutta45.iterate
+      ~RungeKutta45.tqdm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RungeKutta45.explicit
+      ~RungeKutta45.method
+      ~RungeKutta45.name
+      ~RungeKutta45.order
+      ~RungeKutta45.stable
+   
+   
