@@ -25,7 +25,7 @@ def scipy_get_eigen(
     :rtype: tuple[np.ndarray(shape = (:code:`n`)), np.ndarray(shape = (:code:`n`, :code:`shape`)]
     """
     if kwargs.get("sigma") is None:
-        v, w = _eigsh(mat._mul_vector, mat.shape[0], mat.dtype, k=n, **kwargs)
+        v, w = _eigsh(mat._matmul_vector, mat.shape[0], mat.dtype, k=n, **kwargs)
     else:
         # Fallback to default solver
         v, w = eigsh(mat, k=n, which="SA", **kwargs)
